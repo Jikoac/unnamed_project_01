@@ -1,0 +1,137 @@
+from base import *
+farmer=mob(
+    ai=ai(is_hostile=True,min_distance=0,max_distance=70,speed=1),
+    health=1,
+    loot=loot_table(items={'bread':1}),
+    mob_type='farmer',
+    texture='farmer'
+)
+knight=mob(
+    ai=ai(is_hostile=True,max_distance=50,speed=1.5),
+    health=3,
+    loot=loot_table(items={'iron':1}),
+    texture='knight',
+    damage=2,
+    xp=4,
+    mob_type='knight'
+)
+wanderer=mob(
+    ai=ai(is_hostile=True,max_distance=40,speed=2),
+    health=5,
+    loot=loot_table(items={'iron':2,'bread':4,'wood':1},drops=2,limited_items=True),
+    texture='wanderer',
+    damage=3,
+    xp=7,
+    mob_type='wanderer'
+)
+tree_man=mob(
+    ai=ai(is_hostile=True,max_distance=20,speed=1.5),
+    health=10,
+    loot=loot_table(items={'wood':6,'leaf':1}),
+    texture='tree_man',
+    damage=5,
+    xp=12,
+    mob_type='tree_man'
+)
+caveman=mob(
+    ai=ai(is_hostile=True,max_distance=30,speed=1),
+    health=6,
+    loot=loot_table(items={'meat':1,'void':2},drops=2,limited_items=True),
+    texture='caveman',
+    damage=3,
+    xp=7,
+    mob_type='caveman'
+)
+energen=mob(
+    ai=ai(is_hostile=True,max_distance=15,speed=1.5),
+    health=12,
+    loot=loot_table(items={'energy':1,'void':1}),
+    texture='energen',
+    damage=2,
+    xp=19,
+    mob_type='energen'
+)
+dark_wanderer=mob(
+    ai=ai(is_hostile=True,max_distance=25,speed=2.25),
+    health=35,
+    loot=loot_table(items={'energy':2,'iron':1,'void':3,'dark_orb':1},drops=2,limited_items=True),
+    texture='wanderer_dark',
+    damage=5,
+    xp=42,
+    mob_type='dark_wanderer'
+)
+ogre=mob(
+    ai=ai(is_hostile=True,max_distance=0,speed=0.5),
+    health=25,
+    loot=loot_table(items={'meat':2,'bread':1,'void':1},drops=2),
+    texture='ogre',
+    damage=9,
+    xp=25,
+    mob_type='ogre'
+)
+evil_orb=projectile(
+    ai=forward(5,is_hostile=True),
+    health=25,
+    loot=loot_table(items={'dark_orb':1,'energy':3,'void':10},drops=3),
+    texture='evil_orb',
+    damage=15,
+    mob_type='orb'
+)
+wraith=mob(
+    ai=ai(is_hostile=True,max_distance=10,speed=2.4),
+    health=100,
+    loot=loot_table(items={'dark_orb':1,'void':100},drops=3),
+    texture='wanderer_wraith',
+    shape='wanderer',
+    damage=12,
+    xp=75,
+    mob_type='wraith',
+    ranged={
+        'projectile':'evil_orb',
+        'fire_rate':0.25
+    }
+)
+snake=mob(
+    ai=ai(is_hostile=True,max_distance=player.width//2-1,speed=2.5),
+    health=50,
+    loot=loot_table(items={'meat':5,'energy':2,'scale':1},drops=2),
+    texture='snake',
+    damage=9,
+    xp=63,
+    mob_type='snake'
+)
+large_tree_man=mob(
+    ai=ai(is_hostile=True,max_distance=1,speed=1.25),
+    health=35,
+    loot=loot_table(items={'wood':4,'leaf':1},drops=3),
+    texture='tree_man_xl',
+    damage=10,
+    xp=50,
+    mob_type='large_tree_man'
+)
+sheep=mob(
+    ai=ai(is_hostile=False,max_distance=1000,min_distance=800,speed=0.5),
+    health=15,
+    loot=loot_table(items={'meat':4,'void':1},drops=3),
+    texture='shep_',
+    xp=5,
+    mob_type='sheep'
+)
+farmer_armored=mob(
+    ai=ai(is_hostile=True,min_distance=0,max_distance=70,speed=1),
+    health=20,
+    loot=loot_table(items={'bread':1},drops=2),
+    mob_type='farmer',
+    texture='farmored',
+    xp=15,
+    damage=7
+)
+haunter=mob(
+    ai=ai(is_hostile=True,max_distance=5,speed=2.5),
+    health=200,
+    loot=loot_table(items={'dark_orb':1}),
+    texture='haunter',
+    damage=15,
+    xp=100,
+    mob_type='haunter'
+)

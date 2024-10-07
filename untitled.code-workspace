@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "code"
+		},
+		{
+			"path": "mods/example_mod/code"
+		}
+	],
+	"settings": {
+        "python.envFile": "${workspaceFolder}/.env",
+        "python.analysis.extraPaths": [
+            "C:/Users/Public/Projects/Games/unnamed_project_01/code"
+        ]
+    }
+}
