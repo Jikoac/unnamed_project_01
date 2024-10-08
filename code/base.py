@@ -602,7 +602,7 @@ class projectile:
         self.texture_offset=texture_offset
         ranged_data={
             'projectile':'None',
-            'fire_rate':1,
+            'fire_rate':0,
             'offset':(0,0),
             'sound':'none'
             }
@@ -669,7 +669,7 @@ class mob_instance(mob):
         self.facing=facing
         self.cooldown=0
     def shoot(self):
-        if self.fire_rate and isinstance(self.projectile,mob_instance):
+        if self.fire_rate and isinstance(self.projectile,projectile):
             if (game.time%(100//self.fire_rate))==(self.spawned%(100//self.fire_rate)) and game.time>self.spawned:
                 game.spawn(self.projectile,self.x+(self.width/2)-(self.projectile.width/2)+self.projectile_offset[0],self.y+(self.height/2)-(self.projectile.height/2)+self.projectile_offset[1],self.facing,True)
                 pg.mixer.Sound.play(self.shoot_sound)
@@ -868,3 +868,5 @@ class toward_player:
         if x<player.x:
             return 'right'
         return 'left'
+
+pg.mixer.music.load(path.sound('none'))
