@@ -666,7 +666,7 @@ class mob_instance(mob):
     def shoot(self):
         if self.fire_rate:
             if (game.time%(100//self.fire_rate))==(self.spawned%(100//self.fire_rate)) and game.time>self.spawned:
-                game.spawn(projectile,self.x+(self.width/2)-(projectile.width/2)+self.projectile_offset[0],self.y+(self.height/2)-(projectile.height/2)+self.projectile_offset[1],self.facing)
+                game.spawn(self.projectile,self.x+(self.width/2)-(self.projectile.width/2)+self.projectile_offset[0],self.y+(self.height/2)-(self.projectile.height/2)+self.projectile_offset[1],self.facing)
                 pg.mixer.Sound.play(self.shoot_sound)
     def collide(self, other):
         offset_x = other.x - self.x
