@@ -152,3 +152,12 @@ hot_rock=mob(
     xp=100,
     mob_type='hot_rock'
 )
+crying_cherub=mob(
+    ai=creep_ai(is_hostile=True,distance=50,speed=2),
+    health=100,
+    loot=loot_table(items={'dark_orb':1,'void':10}),
+    texture='cherub',
+    damage=10,
+    xp=70,
+    mob_type='crying_cherub'
+)

@@ -258,6 +258,7 @@ def loop():
                     for generator in generators:
                         generator()
                     game.spawn_queue={}
+                    game.despawn_queue=[]
                     for mob in game.mobs.values():
                         mob()
                         if player.control.shield and player.can_shield and mob.collide(player.shield):
@@ -275,6 +276,8 @@ def loop():
                                 player.control.attack=0
                         if mob.is_dead():
                             game.dead.append(mob.id)
+                        if (mob.x<player.x-1500 or mob.x>player.x+1500) and mob.special_ai=='straight_line' and mob==away_from_player():
+                            game.despawn_queue.append(mob.id)
                         if not mob.cooldown and mob.is_hostile and mob.collide(player):
                             mob.cooldown=100
                             player.hp-=mob.damage
@@ -283,6 +286,8 @@ def loop():
                     game.mobs.update(game.spawn_queue)
                     for mob_id in game.dead:
                         game.kill(mob_id)
+                    for mob_id in game.despawn_queue:
+                        game.despawn(mob_id)
                     player()
                     if player.hp<=0:
                         running=False

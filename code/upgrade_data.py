@@ -2,6 +2,7 @@ from base import *
 upgrades=[
     upgrade(texture='dark_orb',items={'dark_orb':10},upgrade_id='power',name='Increase Power',level=16,max=1,upgrade=power_upgrade(1),name_color=(255,0,255)),
     upgrade(items={'iron':10,'wood':4},level=5,upgrade_id='shield_upgrade',name='Shield',max=1,upgrade=lambda:setattr(player, 'can_shield', True),texture='shield_upgrade'),
+    upgrade(texture='xp_boost',items={'wool':5,'scale':2},upgrade_id='xp_ii',name='XP Boost',level=22,max=100,show_uses=True,upgrade=xp_upgrade(0.2)),
     upgrade(texture='attack',upgrade_id='range_5',upgrade=range_upgrade(5),name='Range Upgrade',max=10,show_uses=True,items={'iron':1}),
     upgrade(texture='attack',upgrade_id='range_5_ii',upgrade=range_upgrade(5),name='Range Upgrade II',max=5,show_uses=True,items={'iron':2},level=4),
     upgrade(texture='attack',upgrade_id='range_5_iii',upgrade=range_upgrade(5),name='Range Upgrade III',max=5,show_uses=True,items={'iron':1,'wood':1},level=7),

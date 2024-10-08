@@ -234,6 +234,8 @@ class game_player:
             self.shield()
         else:
             self.shield.active=False
+    def coord_x(self):
+        return self.x+self.width/2
 player=game_player()
 
 class between:
@@ -366,6 +368,7 @@ class game_class:
         22:150000
     }
     event_cache=[]
+    despawn_queue=[]
     music=False
     #screen=screen
     def spawn(self,mob,x,y,facing:str|None=None,queue:bool=False):
@@ -552,6 +555,28 @@ class ai_line:
         self.special_ai='straight_line'
         self.is_hostile=is_hostile
 
+class creep_ai:
+    def __init__(self,
+                speed:float|int=1,
+                is_hostile:bool=True,
+                distance:int=50
+                ):
+        self.speed=speed
+        self.is_hostile=is_hostile
+        self.special_ai='creep'
+        self.distance=distance
+
+class sneak_ai:
+    def __init__(self,
+                speed:float|int=1,
+                is_hostile:bool=False,
+                distance:int=1500
+                ):
+        self.speed=speed
+        self.is_hostile=is_hostile
+        self.special_ai='sneak'
+        self.distance=distance
+
 class projectile:
     def __init__(self,
             ai:str='ai_line(2)',
@@ -706,6 +731,14 @@ class mob_instance(mob):
                 self.x+=self.speed
             else:
                 self.x-=self.speed
+        elif self.special_ai=='creep':
+            self.facing=self@toward_player()
+            if self.unwatched:
+                self.walk()
+        elif self.special_ai=='sneak':
+            self.facing=self@away_from_player()
+            if self.unwatched:
+                self.walk()
         elif self.special_ai=='custom':
             self.ai
         self.texture=self.textures[self.facing]
@@ -715,6 +748,23 @@ class mob_instance(mob):
         if self.health<=0 and self.max_health:
             return True
         return False
+    def walk(self):
+        if self.facing=='left':
+            self.x-=self.speed
+        else:
+            self.x+=self.speed
+    def coord_x(self):
+        return self.x+self.width/2
+    def distance(self):
+        return abs(self.coord_x()-player.coord_x())
+    def watched(self):
+        if self.coord_x()<player.coord_x() and player.facing=='left':
+            return True
+        elif self.coord_x()>player.coord_x() and player.facing=='right':
+            return True
+        return False
+    def unwatched(self):
+        return not self.watched()
 class spawn_rule:
     def __init__(self,
             chance:float=1,
@@ -864,9 +914,45 @@ def add(x,y):
     return tuple([x[i]+y[i] for i in range(len(x))])
 
 class toward_player:
-    def __rmul__(self,x:float|int):
-        if x<player.x:
+    def __rmul__(self,it:float|int|mob_instance):
+        if isinstance(it,mob_instance):
+            if it.x<player.x:
+                return 'right'
+            return 'left'
+        else:
+            if it<player.x:
+                return 'right'
+            return 'left'
+    def __rdiv__(self,it:float|int|mob_instance):
+        if isinstance(it,mob_instance):
+            if it.x<player.x:
+                return 'left'
             return 'right'
-        return 'left'
+        else:
+            if it<player.x:
+                return 'left'
+            return 'right'
+    def __rmatmul__(self,it:float|int|mob_instance):
+        return it*self
+    def __rmod__(self,it:float|int|mob_instance):
+        return it/self
+    def __eq__(self,it:mob_instance):
+        if it.x<player.x and it.facing=='right':
+            return True
+        elif it.x>player.x and it.facing=='left':
+            return True
+        return False
+
+class away_from_player:
+    def __eq__(self,it:mob_instance):
+        return it!=toward_player()
+    def __rmatmul__(self,it:float|int|mob_instance):
+        return it/toward_player()
+    def __rmul__(self,it:float|int|mob_instance):
+        return it/toward_player()
+    def __rdiv__(self,it:float|int|mob_instance):
+        return it@toward_player()
+    def __rmod__(self,it:float|int|mob_instance):
+        return it@toward_player()
 
 pg.mixer.music.load(path.sound('none'))
