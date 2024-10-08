@@ -119,7 +119,7 @@ large_tree_man=mob(
 sheep=mob(
     ai=ai(is_hostile=False,max_distance=1000,min_distance=800,speed=0.5),
     health=15,
-    loot=loot_table(items={'meat':4,'void':1},drops=3),
+    loot=loot_table(items={'meat':4,'void':1,'wool':2},drops=3),
     texture='shep_',
     xp=5,
     mob_type='sheep'
@@ -141,4 +141,14 @@ haunter=mob(
     damage=15,
     xp=100,
     mob_type='haunter'
+)
+hot_rock=mob(
+    ai=ai_line(is_hostile=True,speed=3.5),
+    health=50,
+    loot=loot_table(items={'void':1}),
+    texture='hot_rock',
+    shape='hot_rock_mask',
+    damage=25,
+    xp=100,
+    mob_type='hot_rock'
 )

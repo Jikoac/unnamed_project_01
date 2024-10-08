@@ -26,7 +26,7 @@ leaf=item(
 )
 energy=item(
     item_id='energy',
-    texture='energy',
+    texture='lightning',
     name='Energy'
 )
 dark_orb=item(
@@ -44,3 +44,8 @@ scale=item(
     name='Scale',
     texture='scale'
 )
+wool=item(
+    item_id='wool',
+    name='Wool',
+    texture='wool'
+    )

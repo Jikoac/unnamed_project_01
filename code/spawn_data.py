@@ -16,5 +16,6 @@ generators=[
     spawn_rule(min_distance=900,max_distance=1000,mob=wraith,chance=0.5,min_level=11,spawn_height=50),
     spawn_rule(min_distance=1000,max_distance=1000,mob=haunter,chance=0.25,min_level=12),
     spawn_rule(min_distance=50,max_distance=350,mob=sheep,chance=1,min_level=6),
-    spawn_rule(min_distance=player.width*2,mob=farmer_armored,chance=2.5,min_level=8,max_level=13)
+    spawn_rule(min_distance=player.width*2,mob=farmer_armored,chance=2.5,min_level=8,max_level=13),
+    spawn_rule(min_distance=1000,max_distance=1200,mob=hot_rock,chance=10,min_level=7,spawn_height=100)
 ]

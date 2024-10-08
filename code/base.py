@@ -367,7 +367,9 @@ class game_class:
     }
     event_cache=[]
     #screen=screen
-    def spawn(self,mob,x,y,facing:str='right',queue:bool=False):
+    def spawn(self,mob,x,y,facing:str|None=None,queue:bool=False):
+        if facing==None:
+            facing=x*toward_player()
         number='0'*(8-len(hex(self.mob_count)))+hex(self.mob_count).replace('0x','')
         if not queue:
             self.mobs.update({number:mob_instance(mob,x,y,number,facing)})
@@ -656,8 +658,6 @@ class item:
             self.name=name
 
 class mob_instance(mob):
-    def __call__(self):
-        return
     def __init__(self,data:mob,x:float,y:float,mob_id:str='000000',facing:str='right'):
         self.__dict__.update(data.__dict__)
         self.x=x
@@ -861,3 +861,9 @@ resize=pg.transform.scale
 
 def add(x,y):
     return tuple([x[i]+y[i] for i in range(len(x))])
+
+class toward_player:
+    def __rmul__(self,x:float|int):
+        if x<player.x:
+            return 'right'
+        return 'left'
