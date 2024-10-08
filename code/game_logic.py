@@ -255,6 +255,7 @@ def loop():
                         pg.mouse.set_pos(960,540)
                     for generator in generators:
                         generator()
+                    game.spawn_queue={}
                     for mob in game.mobs.values():
                         mob()
                         if player.control.shield and player.can_shield and mob.collide(player.shield):
@@ -277,6 +278,7 @@ def loop():
                             player.hp-=mob.damage
                         else:
                             mob.cooldown=max(0,mob.cooldown-1)
+                    game.mobs.update(game.spawn_queue)
                     for mob_id in game.dead:
                         game.kill(mob_id)
                     player()

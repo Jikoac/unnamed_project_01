@@ -87,7 +87,14 @@ wraith=mob(
     xp=75,
     mob_type='wraith',
     ranged={
-        'projectile':'evil_orb',
+        'projectile':"""projectile(
+ai=forward(5,is_hostile=True),
+health=25,
+loot=loot_table(items={'dark_orb':1,'energy':3,'void':10},drops=3),
+texture='evil_orb',
+damage=15,
+mob_type='orb'
+)""",
         'fire_rate':0.25
     }
 )

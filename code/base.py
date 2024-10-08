@@ -334,6 +334,7 @@ class game_class:
     scroll=0
     scroll_items=0
     dead=[]
+    spawn_queue={}
     mobs={}
     mob_count=0
     time=0
@@ -366,9 +367,12 @@ class game_class:
     }
     event_cache=[]
     #screen=screen
-    def spawn(self,mob,x,y,facing='right'):
+    def spawn(self,mob,x,y,facing:str='right',queue:bool=False):
         number='0'*(8-len(hex(self.mob_count)))+hex(self.mob_count).replace('0x','')
-        self.mobs.update({number:mob_instance(mob,x,y,number,facing)})
+        if not queue:
+            self.mobs.update({number:mob_instance(mob,x,y,number,facing)})
+        else:
+            self.spawn_queue.update({number:mob_instance(mob,x,y,number,facing)})
         self.mob_count+=1
     def kill(self,mob_id):
         self.mobs[mob_id].give_loot()
@@ -664,9 +668,9 @@ class mob_instance(mob):
         self.facing=facing
         self.cooldown=0
     def shoot(self):
-        if self.fire_rate:
+        if self.fire_rate and isinstance(self.projectile,mob_instance):
             if (game.time%(100//self.fire_rate))==(self.spawned%(100//self.fire_rate)) and game.time>self.spawned:
-                game.spawn(self.projectile,self.x+(self.width/2)-(self.projectile.width/2)+self.projectile_offset[0],self.y+(self.height/2)-(self.projectile.height/2)+self.projectile_offset[1],self.facing)
+                game.spawn(self.projectile,self.x+(self.width/2)-(self.projectile.width/2)+self.projectile_offset[0],self.y+(self.height/2)-(self.projectile.height/2)+self.projectile_offset[1],self.facing,True)
                 pg.mixer.Sound.play(self.shoot_sound)
     def collide(self, other):
         offset_x = other.x - self.x
