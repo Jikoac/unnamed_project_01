@@ -203,6 +203,8 @@ def loop():
     fullscreen=True
     game_tick = pg.USEREVENT + 1
     pg.time.set_timer(game_tick, 10)
+    if game.music:
+        pg.mixer.music.play(-1)
     while running:
         game.events=pg.event.get()
         for event in game.events:
@@ -293,6 +295,7 @@ def loop():
                 game.time+=1
                 if game.level==11:
                     dark_orb.name='Dark Orb'
+    pg.mixer.music.stop()
     display_score()
 
 def display_score():

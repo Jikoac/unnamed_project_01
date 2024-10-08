@@ -366,6 +366,7 @@ class game_class:
         22:150000
     }
     event_cache=[]
+    music=False
     #screen=screen
     def spawn(self,mob,x,y,facing:str|None=None,queue:bool=False):
         if facing==None:
