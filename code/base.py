@@ -198,6 +198,21 @@ class game_player:
         self.shield=self.player_shield()
         self.knockback=1
         self.jump_sound=pg.mixer.Sound(path.sound('jump'))
+        self.armor=0
+        self.reflection=0
+        self.armor_textures={
+            'right':pg.image.load(path.texture('armor')),
+            'left':pg.transform.flip(pg.image.load(path.texture('armor')),True,False)
+        }
+        self.full_armor_textures={
+            'right':pg.image.load(path.texture('full_armor')),
+            'left':pg.transform.flip(pg.image.load(path.texture('full_armor')),True,False)
+        }
+        self.full_armor_shapes={
+            'right':pg.mask.from_surface(pg.image.load(path.texture('full_armor'))),
+            'left':flip_mask(pg.mask.from_surface(pg.image.load(path.texture('full_armor'))))
+        }
+        self.can_guard=False
     def __call__(self):
         self.control()
         if self.control.jump>0:
@@ -235,7 +250,12 @@ class game_player:
         else:
             self.shield.active=False
     def coord_x(self):
-        return self.x+self.width/2
+        return self.x+(self.width/2)
+    def evolve(self):
+        self.textures=self.full_armor_textures
+        self.shapes=self.full_armor_shapes
+        self.height=212
+        self.can_guard=True
 player=game_player()
 
 class between:
@@ -733,11 +753,11 @@ class mob_instance(mob):
                 self.x-=self.speed
         elif self.special_ai=='creep':
             self.facing=self@toward_player()
-            if self.unwatched:
+            if self.unwatched():
                 self.walk()
         elif self.special_ai=='sneak':
             self.facing=self@away_from_player()
-            if self.unwatched:
+            if self.unwatched():
                 self.walk()
         elif self.special_ai=='custom':
             self.ai
@@ -754,7 +774,7 @@ class mob_instance(mob):
         else:
             self.x+=self.speed
     def coord_x(self):
-        return self.x+self.width/2
+        return self.x+(self.width/2)
     def distance(self):
         return abs(self.coord_x()-player.coord_x())
     def watched(self):
@@ -837,6 +857,14 @@ def knock_upgrade(power:int=1):
 def strike_upgrade(power:int=1):
     def wrapper():
         player.attack.speed+=power
+    return wrapper
+def armor_upgrade(power:int=1):
+    def wrapper():
+        player.armor+=power
+    return wrapper
+def reflection_upgrade(power:int=1):
+    def wrapper():
+        player.reflection+=power
     return wrapper
 def multiple(*functions):
     def output():

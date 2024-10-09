@@ -18,6 +18,8 @@ def display(show:bool=True):
                     (mob.x-player.x+mob.texture_offset[0]+(960-player.width//2),
                     1030-mob.height-mob.y+mob.texture_offset[1]))
     screen.blit(player.texture,(960-player.width//2,1030-player.height-player.y))
+    if player.armor:
+        screen.blit(player.armor_textures[player.facing],(960-player.width//2,1030-player.height-player.y))
     loc=50
     for i in player.loot:
         try:
@@ -279,8 +281,20 @@ def loop():
                         if (mob.x<player.x-1500 or mob.x>player.x+1500) and mob.special_ai=='straight_line' and mob==away_from_player():
                             game.despawn_queue.append(mob.id)
                         if not mob.cooldown and mob.is_hostile and mob.collide(player):
+                            if player.control.shield and player.can_guard:
+                                if randrange(round(100/(player.armor*1.5))):
+                                    player.hp-=mob.damage
+                                else:
+                                    player.shield.sound.play()
+                            elif player.armor:
+                                if randrange(round(100/player.armor)):
+                                    player.hp-=mob.damage
+                                else:
+                                    player.shield.sound.play()
+                            else:
+                                player.hp-=mob.damage
+                            mob.health-=round(mob.damage*player.reflection/100)
                             mob.cooldown=100
-                            player.hp-=mob.damage
                         else:
                             mob.cooldown=max(0,mob.cooldown-1)
                     game.mobs.update(game.spawn_queue)
@@ -291,8 +305,6 @@ def loop():
                     player()
                     if player.hp<=0:
                         running=False
-                    if game.level==21:
-                        running=False
                     display()
                 if keys[pg.K_p]:
                     print(player.xp)
@@ -300,6 +312,8 @@ def loop():
                 game.time+=1
                 if game.level==11:
                     dark_orb.name='Dark Orb'
+                if player.armor>=50 and not player.can_guard:
+                    player.evolve()
     pg.mixer.music.stop()
     display_score()
 

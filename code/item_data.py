@@ -49,3 +49,8 @@ wool=item(
     name='Wool',
     texture='wool'
     )
+marble=item(
+    item_id='marble',
+    name='Marble',
+    texture='marble'
+    )
