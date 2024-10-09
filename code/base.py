@@ -256,6 +256,7 @@ class game_player:
         self.shapes=self.full_armor_shapes
         self.height=212
         self.can_guard=True
+        self.texture=self.textures[self.facing]
 player=game_player()
 
 class between:
@@ -379,7 +380,7 @@ class game_class:
         13:20000,
         14:25000,
         15:30000,
-        15:35000,
+        16:35000,
         17:40000,
         18:50000,
         19:60000,
