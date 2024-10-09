@@ -145,7 +145,7 @@ haunter=mob(
 hot_rock=mob(
     ai=ai_line(is_hostile=True,speed=3.5),
     health=50,
-    loot=loot_table(items={'void':1}),
+    loot=loot_table(items={'void':1,'marble':2}),
     texture='hot_rock',
     shape='hot_rock_mask',
     damage=25,
@@ -155,7 +155,7 @@ hot_rock=mob(
 crying_cherub=mob(
     ai=creep_ai(is_hostile=True,distance=50,speed=2),
     health=100,
-    loot=loot_table(items={'dark_orb':1,'void':10}),
+    loot=loot_table(items={'marble':1}),
     texture='cherub',
     damage=10,
     xp=70,
