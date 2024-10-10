@@ -4,7 +4,7 @@ def update(image:pg.Surface=none,pos:tuple=(0,0)):
     screen.blit(image,pos)
     pg.display.flip()
 
-def display(show:bool=True):
+def display(show:bool=True,show_name:bool=True):
     screen.blit(background,(0,0))
     screen.blit(ground,((1920-player.x)%1920,1030))
     screen.blit(ground,(((1920-player.x)%1920)-1920,1030))
@@ -35,11 +35,12 @@ def display(show:bool=True):
         screen.blit(item_count,(loc+75+game.scroll_items,175))
         screen.blit(item_name,(loc+game.scroll_items,25))
         loc+=150
-    name=font.render(f'{str(game.level)}. {player.name}',True,(255,255,255))
-    health=font.render(f'{str(player.hp)}/{str(player.max_hp)}',True,(255,255,255))
-    screen.blit(name,(1895-name.get_width(),25))
-    screen.blit(health,(1895-health.get_width(),50))
-    screen.blit(heart,(1877-health.get_width(),51))
+    if show_name:
+        name=font.render(f'{str(game.level)}. {player.name}',True,(255,255,255))
+        health=font.render(f'{str(player.hp)}/{str(player.max_hp)}',True,(255,255,255))
+        screen.blit(name,(1895-name.get_width(),25))
+        screen.blit(health,(1895-health.get_width(),50))
+        screen.blit(heart,(1877-health.get_width(),51))
     if show:
         update()
 
@@ -194,6 +195,52 @@ def start():
             return True
     return False
 
+def display_stats(end:bool=False):
+    running=True
+    game.event_cache=[]
+    while running:
+        if end:
+            screen.fill((0,60,50))
+        else:
+            display(False,False)
+        for event in pg.event.get():
+            if event.type==pg.QUIT:
+                running=False
+            elif event.type==pg.MOUSEBUTTONDOWN:
+                game.event_cache.append(event)
+        keys=pg.key.get_pressed()
+        if keys[pg.K_ESCAPE]:
+            running=False
+        upgrade_info=font.render(f'Upgrades ({str(affordable_upgrades())})',True,(255,255,255))
+        screen.blit(upgrade_info,(1895-upgrade_info.get_width(),25))
+        if button(1895-upgrade_info.get_width(),0,upgrade_info.get_width()+25,upgrade_info.get_height()+25):
+            running=False
+        if keys[pg.K_q] and keys[pg.K_LCTRL]:
+            running=False
+        stats:list[str]=[
+            f'Health: {player.hp}/{player.max_hp}',
+            f'Level: {game.level}',
+            f'XP: {player.xp}',
+            f'Damage: {player.damage}',
+            f'Armor: {player.armor}%',
+            f'Speed: {player.speed/2}x',
+            f'Range: {player.range}',
+            f'Knockback: {player.knockback}',
+            f'Reflection: {player.reflection}%',
+            f'Strike Speed: {player.attack.speed/10}x',
+            f'XP Multiplier: {player.xp_boost}x',
+            f'Power: {player.power}'
+        ]
+        screen.blit(font_large.render(player.name,True,(255,255,255)),(500,200))
+        y_coord=275
+        if end and keys[pg.K_RETURN]:
+            running=False
+        for stat in stats:
+            screen.blit(font.render(stat,True,(255,255,255)),(500,y_coord))
+            y_coord+=50
+        pg.display.flip()
+        game.event_cache=[]
+
 def scroll():
     for event in game.event_cache:
         if event.type==pg.MOUSEWHEEL:
@@ -256,6 +303,8 @@ def loop():
                             up_loc+=550
                     if debug_button():
                         debug_mode()
+                    if button(1895-player.name_width(),0,player.name_width()+25,100):
+                        display_stats()
                     pause_display()
                 else:
                     game.scroll=0

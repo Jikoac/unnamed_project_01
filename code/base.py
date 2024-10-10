@@ -257,6 +257,9 @@ class game_player:
         self.height=212
         self.can_guard=True
         self.texture=self.textures[self.facing]
+    def name_width(self):
+        name=font.render(f'{str(game.level)}. {player.name}',True,(255,255,255))
+        return name.get_width()
 player=game_player()
 
 class between:
@@ -921,6 +924,15 @@ class upgrade:
                 player.loot[i]-=self.items[i]
             return True
         return False
+    def is_affordable(self):
+        affordable=True
+        for i in self.items:
+            try:
+                if player.loot[i]<self.items[i]:
+                    affordable=False
+            except:
+                affordable=False
+        return affordable
 
 forward=ai_line
 no_ai=ai(speed=0)
@@ -933,6 +945,7 @@ error_texture=pg.image.load(path.texture('deny'))
 heart=pg.image.load(path.texture('lil_heart'))
 
 font=pg.font.SysFont('Noto Sans',25)
+font_large=pg.font.SysFont('Noto Sans',50)
 
 generators=[]
 upgrades=[]
@@ -990,5 +1003,8 @@ def has_enough(item,quantity):
             if player.loot[i]>=quantity:
                 return True
     return False
+
+def affordable_upgrades():
+    return len([upgrade for upgrade in upgrades if upgrade.is_affordable()])
 
 pg.mixer.music.load(path.sound('none'))

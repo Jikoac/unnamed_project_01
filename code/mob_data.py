@@ -101,7 +101,7 @@ mob_type='orb'
 snake=mob(
     ai=ai(is_hostile=True,max_distance=player.width//2-1,speed=2.5),
     health=50,
-    loot=loot_table(items={'meat':5,'energy':2,'scale':1},drops=2),
+    loot=loot_table(items={'meat':4,'energy':1,'scale':2},drops=2),
     texture='snake',
     damage=9,
     xp=63,
@@ -145,7 +145,7 @@ haunter=mob(
 hot_rock=mob(
     ai=ai_line(is_hostile=True,speed=3.5),
     health=50,
-    loot=loot_table(items={'void':1,'marble':2}),
+    loot=loot_table(items={'marble':1},drops=3),
     texture='hot_rock',
     shape='hot_rock_mask',
     damage=25,
