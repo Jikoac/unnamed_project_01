@@ -984,4 +984,11 @@ class away_from_player:
     def __rmod__(self,it:float|int|mob_instance):
         return it@toward_player()
 
+def has_enough(item,quantity):
+    for i in player.loot:
+        if i==item:
+            if player.loot[i]>=quantity:
+                return True
+    return False
+
 pg.mixer.music.load(path.sound('none'))

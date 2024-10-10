@@ -52,11 +52,16 @@ def pause_display():
                 screen.blit(resize(upgrade.texture,(500,500)),(loc+game.scroll,250))
                 upgrade_name=font.render(upgrade.name,True,upgrade.name_color)
                 screen.blit(upgrade_name,(loc+game.scroll,800))
+                pg.draw.rect(screen,(255,255,255),pg.Rect(loc+game.scroll-2,248,504,504),2)
                 if upgrade.show_uses:
                     uses_tooltip(loc+game.scroll,250,500,500,str(upgrade.max))
                 item_loc=0
                 for item in upgrade.items:
-                    item_count=font.render(str(upgrade.items[item]),True,(255,255,255))
+                    if has_enough(item,upgrade.items[item]):
+                        text_color=(255,255,255)
+                    else:
+                        text_color=(255,0,0)
+                    item_count=font.render(str(upgrade.items[item]),True,text_color)
                     try:item=eval(item)
                     except:None
                     try:
