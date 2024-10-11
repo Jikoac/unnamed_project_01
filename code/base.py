@@ -946,6 +946,7 @@ heart=pg.image.load(path.texture('lil_heart'))
 
 font=pg.font.SysFont('Noto Sans',25)
 font_large=pg.font.SysFont('Noto Sans',50)
+font_xl=pg.font.SysFont('Noto Sans',100)
 
 generators=[]
 upgrades=[]
@@ -1008,3 +1009,17 @@ def affordable_upgrades():
     return len([upgrade for upgrade in upgrades if upgrade.is_affordable()])
 
 pg.mixer.music.load(path.sound('none'))
+
+class rounded:
+    def __init__(self,value:int=0):
+        self.value=value
+        if value>0:
+            self.degree=10**value
+        elif value<0:
+            self.degree=1/10**value
+        else:
+            self.degree=1
+    def __rmul__(self,other):
+        return round(other*self.degree)/self.degree
+    def __rmatmul__(self,other):
+        return other*self

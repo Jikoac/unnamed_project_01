@@ -223,7 +223,8 @@ def display_stats(end:bool=False):
             f'XP: {player.xp}',
             f'Damage: {player.damage}',
             f'Armor: {player.armor}%',
-            f'Speed: {player.speed/2}x',
+            f'Speed: {(player.speed/2)@rounded(3)}x',
+            f'Jump Height: {player.jump_height/50}x',
             f'Range: {player.range}',
             f'Knockback: {player.knockback}',
             f'Reflection: {player.reflection}%',
@@ -238,6 +239,9 @@ def display_stats(end:bool=False):
         for stat in stats:
             screen.blit(font.render(stat,True,(255,255,255)),(500,y_coord))
             y_coord+=50
+        if end:
+            screen.blit(font_large.render('Progress',True,(255,255,255)),(1000,200))
+            screen.blit(font_xl.render(f'{player.xp/100}%',True,(255,255,255)),(1145-font_xl.render(f'{player.xp/100}%',True,(255,255,255)).get_width(),275))
         pg.display.flip()
         game.event_cache=[]
 
@@ -370,7 +374,7 @@ def loop():
                 if player.armor>=50 and not player.can_guard:
                     player.evolve()
     pg.mixer.music.stop()
-    display_score()
+    game_end()
 
 def display_score():
     screen.fill((0,60,50))
@@ -390,6 +394,18 @@ def display_score():
     location=level.get_rect(center=(960,600))
     screen.blit(level,location)
     pg.display.flip()
+    running=True
+    pg.time.delay(500)
+    while running:
+        for event in pg.event.get():
+            if event.type==pg.QUIT:
+                running=False
+        keys=pg.key.get_pressed()
+        if (keys[pg.K_LCTRL] and keys[pg.K_q]) or keys[pg.K_RETURN] or keys[pg.K_ESCAPE]:
+            running=False
+
+def game_end():
+    display_stats(True)
     running=True
     pg.time.delay(500)
     while running:
