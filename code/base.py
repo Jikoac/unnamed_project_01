@@ -53,6 +53,10 @@ class path:
 
 path=path()
 
+start_screen=pg.image.load(path.texture('start'))
+screen.blit(start_screen,(0,0))
+pg.display.flip()
+
 class game_player:
     class player_shield:
         def __init__(self):
