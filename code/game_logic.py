@@ -18,7 +18,7 @@ def display(show:bool=True,show_name:bool=True):
                     (mob.x-player.x+mob.texture_offset[0]+(960-player.width//2),
                     1030-mob.height-mob.y+mob.texture_offset[1]))
     screen.blit(player.texture,(960-player.width//2,1030-player.height-player.y))
-    if player.armor:
+    if player.armor and player.armor<50:
         screen.blit(player.armor_textures[player.facing],(960-player.width//2,1030-player.height-player.y))
     loc=50
     for i in player.loot:
@@ -211,10 +211,11 @@ def display_stats(end:bool=False):
         keys=pg.key.get_pressed()
         if keys[pg.K_ESCAPE]:
             running=False
-        upgrade_info=font.render(f'Upgrades ({str(affordable_upgrades())})',True,(255,255,255))
-        screen.blit(upgrade_info,(1895-upgrade_info.get_width(),25))
-        if button(1895-upgrade_info.get_width(),0,upgrade_info.get_width()+25,upgrade_info.get_height()+25):
-            running=False
+        if not end:
+            upgrade_info=font.render(f'Upgrades ({str(affordable_upgrades())})',True,(255,255,255))
+            screen.blit(upgrade_info,(1895-upgrade_info.get_width(),25))
+            if button(1895-upgrade_info.get_width(),0,upgrade_info.get_width()+25,upgrade_info.get_height()+25):
+                running=False
         if keys[pg.K_q] and keys[pg.K_LCTRL]:
             running=False
         stats:list[str]=[
@@ -373,6 +374,9 @@ def loop():
                     dark_orb.name='Dark Orb'
                 if player.armor>=50 and not player.can_guard:
                     player.evolve()
+                if game.mode.debug and keys[pg.K_RCTRL]:
+                    debug_mode()
+                    paused=False
     pg.mixer.music.stop()
     game_end()
 

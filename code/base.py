@@ -351,6 +351,9 @@ class test_mouse_click:
             self._click = False
 
 class game_class:
+    class mode:
+        debug=False
+        photo=False
     keys={
         'l_mouse':test_mouse_click(),
         'esc':key(),
