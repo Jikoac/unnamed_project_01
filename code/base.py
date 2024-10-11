@@ -253,6 +253,38 @@ class game_player:
             self.shield()
         else:
             self.shield.active=False
+    def pose(self):
+        self.control()
+        if self.control.jump>0:
+            self.y+=4.5
+            self.control.jump-=1
+        else:
+            self.y=max(self.y-3,0)
+        if self.control.move=='left':
+            self.facing='left'
+            self.x-=self.speed
+            if self.y>50:
+                self.x-=self.speed/10
+        elif self.control.move=='right':
+            self.facing='right'
+            self.x+=self.speed
+            if self.y>50:
+                self.x+=self.speed/10
+        self.texture=self.textures[self.facing]
+        self.shape=self.shapes[self.facing]
+        if self.control.attack:
+            if self.control.attack==self.range:
+                if self.facing=='right':
+                    self.attack.x=self.x+self.width
+                if self.facing=='left':
+                    self.attack.x=self.x-self.attack.width
+                self.attack()
+                self.control.attack-=1
+            self.control.attack=self.control.attack
+        if self.control.shield:
+            self.shield()
+        else:
+            self.shield.active=False
     def coord_x(self):
         return self.x+(self.width/2)
     def evolve(self):

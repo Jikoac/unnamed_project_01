@@ -258,6 +258,7 @@ def scroll():
                 game.scroll_items=0
 
 def loop():
+    photo_mode=False
     running=True
     paused=False
     fullscreen=True
@@ -290,6 +291,10 @@ def loop():
                 keys=pg.key.get_pressed()
                 if keys[pg.K_LCTRL] and keys[pg.K_q]:
                     running=False
+                if keys[pg.K_p] and keys[pg.K_LCTRL] and game.mode.photo:
+                    photo_mode=True
+                if keys[pg.K_ESCAPE] and keys[pg.K_LCTRL]:
+                    photo_mode=False
                 if paused:
                     player.control.get_select()
                     player.control.move_mouse()
@@ -317,59 +322,62 @@ def loop():
                     if game.keys['pause'].click or game.keys['esc'].click:
                         paused=True
                         pg.mouse.set_pos(960,540)
-                    for generator in generators:
-                        generator()
-                    game.spawn_queue={}
-                    game.despawn_queue=[]
-                    for mob in game.mobs.values():
-                        mob()
-                        if player.control.shield and player.can_shield and mob.collide(player.shield):
-                            if mob.special_ai=='straight_line':
-                                mob.facing=player.shield.facing
-                            elif player.facing=='left':
-                                mob.x-=2*mob.speed*player.knockback
-                            else:
-                                mob.x+=2*mob.speed*player.knockback
-                        if player.control.attack and mob.collide(player.attack):
-                            mob.health-=player.damage
-                            if mob.health>0:
-                                player.attack.power-=1
-                            if player.attack.power==0:
-                                player.control.attack=0
-                        if mob.is_dead():
-                            game.dead.append(mob.id)
-                        if (mob.x<player.x-1500 or mob.x>player.x+1500) and mob.special_ai=='straight_line' and mob==away_from_player():
-                            game.despawn_queue.append(mob.id)
-                        if not mob.cooldown and mob.is_hostile and mob.collide(player):
-                            if player.control.shield and player.can_guard:
-                                if randrange(round(100/(player.armor*1.5))):
-                                    player.hp-=mob.damage
+                    if not photo_mode:
+                        for generator in generators:
+                            generator()
+                        game.spawn_queue={}
+                        game.despawn_queue=[]
+                        for mob in game.mobs.values():
+                            mob()
+                            if player.control.shield and player.can_shield and mob.collide(player.shield):
+                                if mob.special_ai=='straight_line':
+                                    mob.facing=player.shield.facing
+                                elif player.facing=='left':
+                                    mob.x-=2*mob.speed*player.knockback
                                 else:
-                                    player.shield.sound.play()
-                            elif player.armor:
-                                if randrange(round(100/player.armor)):
-                                    player.hp-=mob.damage
+                                    mob.x+=2*mob.speed*player.knockback
+                            if player.control.attack and mob.collide(player.attack):
+                                mob.health-=player.damage
+                                if mob.health>0:
+                                    player.attack.power-=1
+                                if player.attack.power==0:
+                                    player.control.attack=0
+                            if mob.is_dead():
+                                game.dead.append(mob.id)
+                            if (mob.x<player.x-1500 or mob.x>player.x+1500) and mob.special_ai=='straight_line' and mob==away_from_player():
+                                game.despawn_queue.append(mob.id)
+                            if not mob.cooldown and mob.is_hostile and mob.collide(player):
+                                if player.control.shield and player.can_guard:
+                                    if randrange(round(100/(player.armor*1.5))):
+                                        player.hp-=mob.damage
+                                    else:
+                                        player.shield.sound.play()
+                                elif player.armor:
+                                    if randrange(round(100/player.armor)):
+                                        player.hp-=mob.damage
+                                    else:
+                                        player.shield.sound.play()
                                 else:
-                                    player.shield.sound.play()
+                                    player.hp-=mob.damage
+                                mob.health-=round(mob.damage*player.reflection/100)
+                                mob.cooldown=100
                             else:
-                                player.hp-=mob.damage
-                            mob.health-=round(mob.damage*player.reflection/100)
-                            mob.cooldown=100
-                        else:
-                            mob.cooldown=max(0,mob.cooldown-1)
-                    game.mobs.update(game.spawn_queue)
-                    for mob_id in game.dead:
-                        game.kill(mob_id)
-                    for mob_id in game.despawn_queue:
-                        game.despawn(mob_id)
-                    player()
+                                mob.cooldown=max(0,mob.cooldown-1)
+                        game.mobs.update(game.spawn_queue)
+                        for mob_id in game.dead:
+                            game.kill(mob_id)
+                        for mob_id in game.despawn_queue:
+                            game.despawn(mob_id)
+                    if not photo_mode:
+                        player()
+                    else:
+                        player.pose()
                     if player.hp<=0:
                         running=False
                     display()
-                if keys[pg.K_p]:
-                    print(player.xp)
+                    if not photo_mode:
+                        game.time+=1
                 game.event_cache=[]
-                game.time+=1
                 if game.level==11:
                     dark_orb.name='Dark Orb'
                 if player.armor>=50 and not player.can_guard:
