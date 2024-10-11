@@ -4,7 +4,7 @@ def update(image:pg.Surface=none,pos:tuple=(0,0)):
     screen.blit(image,pos)
     pg.display.flip()
 
-def display(show:bool=True):
+def display(show:bool=True,show_name:bool=True):
     screen.blit(background,(0,0))
     screen.blit(ground,((1920-player.x)%1920,1030))
     screen.blit(ground,(((1920-player.x)%1920)-1920,1030))
@@ -18,6 +18,8 @@ def display(show:bool=True):
                     (mob.x-player.x+mob.texture_offset[0]+(960-player.width//2),
                     1030-mob.height-mob.y+mob.texture_offset[1]))
     screen.blit(player.texture,(960-player.width//2,1030-player.height-player.y))
+    if player.armor and player.armor<50:
+        screen.blit(player.armor_textures[player.facing],(960-player.width//2,1030-player.height-player.y))
     loc=50
     for i in player.loot:
         try:
@@ -33,11 +35,12 @@ def display(show:bool=True):
         screen.blit(item_count,(loc+75+game.scroll_items,175))
         screen.blit(item_name,(loc+game.scroll_items,25))
         loc+=150
-    name=font.render(f'{str(game.level)}. {player.name}',True,(255,255,255))
-    health=font.render(f'{str(player.hp)}/{str(player.max_hp)}',True,(255,255,255))
-    screen.blit(name,(1895-name.get_width(),25))
-    screen.blit(health,(1895-health.get_width(),50))
-    screen.blit(heart,(1877-health.get_width(),51))
+    if show_name:
+        name=font.render(f'{str(game.level)}. {player.name}',True,(255,255,255))
+        health=font.render(f'{str(player.hp)}/{str(player.max_hp)}',True,(255,255,255))
+        screen.blit(name,(1895-name.get_width(),25))
+        screen.blit(health,(1895-health.get_width(),50))
+        screen.blit(heart,(1877-health.get_width(),51))
     if show:
         update()
 
@@ -45,23 +48,29 @@ def pause_display():
     display(False)
     loc=50
     for upgrade in upgrades:
-        if game.level>=upgrade.level and upgrade.max>0:
-            screen.blit(resize(upgrade.texture,(500,500)),(loc+game.scroll,250))
-            upgrade_name=font.render(upgrade.name,True,upgrade.name_color)
-            screen.blit(upgrade_name,(loc+game.scroll,800))
-            if upgrade.show_uses:
-                uses_tooltip(loc+game.scroll,250,500,500,str(upgrade.max))
-            item_loc=0
-            for item in upgrade.items:
-                item_count=font.render(str(upgrade.items[item]),True,(255,255,255))
-                try:item=eval(item)
-                except:None
-                try:
-                    screen.blit(resize(item.texture,(50,50)),(loc+item_loc+game.scroll,850))
-                except:
-                    screen.blit(resize(error_texture,(50,50)),(loc+item_loc+game.scroll,850))
-                screen.blit(item_count,(loc+item_loc+game.scroll,925))
-                item_loc+=75
+        if game.level>=upgrade.level and upgrade.max>0 and loc+game.scroll<1920:
+            if loc+game.scroll>-500:
+                screen.blit(resize(upgrade.texture,(500,500)),(loc+game.scroll,250))
+                upgrade_name=font.render(upgrade.name,True,upgrade.name_color)
+                screen.blit(upgrade_name,(loc+game.scroll,800))
+                pg.draw.rect(screen,(255,255,255),pg.Rect(loc+game.scroll-2,248,504,504),2)
+                if upgrade.show_uses:
+                    uses_tooltip(loc+game.scroll,250,500,500,str(upgrade.max))
+                item_loc=0
+                for item in upgrade.items:
+                    if has_enough(item,upgrade.items[item]):
+                        text_color=(255,255,255)
+                    else:
+                        text_color=(255,0,0)
+                    item_count=font.render(str(upgrade.items[item]),True,text_color)
+                    try:item=eval(item)
+                    except:None
+                    try:
+                        screen.blit(resize(item.texture,(50,50)),(loc+item_loc+game.scroll,850))
+                    except:
+                        screen.blit(resize(error_texture,(50,50)),(loc+item_loc+game.scroll,850))
+                    screen.blit(item_count,(loc+item_loc+game.scroll,925))
+                    item_loc+=75
             loc+=550
     score=font.render(str(player.xp),True,(0,255,0))
     screen.blit(score,(1895-score.get_width(),75))
@@ -186,6 +195,57 @@ def start():
             return True
     return False
 
+def display_stats(end:bool=False):
+    running=True
+    game.event_cache=[]
+    while running:
+        if end:
+            screen.fill((0,60,50))
+        else:
+            display(False,False)
+        for event in pg.event.get():
+            if event.type==pg.QUIT:
+                running=False
+            elif event.type==pg.MOUSEBUTTONDOWN:
+                game.event_cache.append(event)
+        keys=pg.key.get_pressed()
+        if keys[pg.K_ESCAPE]:
+            running=False
+        if not end:
+            upgrade_info=font.render(f'Upgrades ({str(affordable_upgrades())})',True,(255,255,255))
+            screen.blit(upgrade_info,(1895-upgrade_info.get_width(),25))
+            if button(1895-upgrade_info.get_width(),0,upgrade_info.get_width()+25,upgrade_info.get_height()+25):
+                running=False
+        if keys[pg.K_q] and keys[pg.K_LCTRL]:
+            running=False
+        stats:list[str]=[
+            f'Health: {player.hp}/{player.max_hp}',
+            f'Level: {game.level}',
+            f'XP: {player.xp}',
+            f'Damage: {player.damage}',
+            f'Armor: {player.armor}%',
+            f'Speed: {(player.speed/2)@rounded(3)}x',
+            f'Jump Height: {player.jump_height/50}x',
+            f'Range: {player.range}',
+            f'Knockback: {player.knockback}',
+            f'Reflection: {player.reflection}%',
+            f'Strike Speed: {player.attack.speed/10}x',
+            f'XP Multiplier: {player.xp_boost}x',
+            f'Power: {player.power}'
+        ]
+        screen.blit(font_large.render(player.name,True,(255,255,255)),(500,200))
+        y_coord=275
+        if end and keys[pg.K_RETURN]:
+            running=False
+        for stat in stats:
+            screen.blit(font.render(stat,True,(255,255,255)),(500,y_coord))
+            y_coord+=50
+        if end:
+            screen.blit(font_large.render('Progress',True,(255,255,255)),(1000,200))
+            screen.blit(font_xl.render(f'{player.xp/100}%',True,(255,255,255)),(1145-font_xl.render(f'{player.xp/100}%',True,(255,255,255)).get_width(),275))
+        pg.display.flip()
+        game.event_cache=[]
+
 def scroll():
     for event in game.event_cache:
         if event.type==pg.MOUSEWHEEL:
@@ -203,6 +263,8 @@ def loop():
     fullscreen=True
     game_tick = pg.USEREVENT + 1
     pg.time.set_timer(game_tick, 10)
+    if game.music:
+        pg.mixer.music.play(-1)
     while running:
         game.events=pg.event.get()
         for event in game.events:
@@ -246,6 +308,8 @@ def loop():
                             up_loc+=550
                     if debug_button():
                         debug_mode()
+                    if button(1895-player.name_width(),0,player.name_width()+25,100):
+                        display_stats()
                     pause_display()
                 else:
                     game.scroll=0
@@ -255,6 +319,8 @@ def loop():
                         pg.mouse.set_pos(960,540)
                     for generator in generators:
                         generator()
+                    game.spawn_queue={}
+                    game.despawn_queue=[]
                     for mob in game.mobs.values():
                         mob()
                         if player.control.shield and player.can_shield and mob.collide(player.shield):
@@ -272,17 +338,32 @@ def loop():
                                 player.control.attack=0
                         if mob.is_dead():
                             game.dead.append(mob.id)
+                        if (mob.x<player.x-1500 or mob.x>player.x+1500) and mob.special_ai=='straight_line' and mob==away_from_player():
+                            game.despawn_queue.append(mob.id)
                         if not mob.cooldown and mob.is_hostile and mob.collide(player):
+                            if player.control.shield and player.can_guard:
+                                if randrange(round(100/(player.armor*1.5))):
+                                    player.hp-=mob.damage
+                                else:
+                                    player.shield.sound.play()
+                            elif player.armor:
+                                if randrange(round(100/player.armor)):
+                                    player.hp-=mob.damage
+                                else:
+                                    player.shield.sound.play()
+                            else:
+                                player.hp-=mob.damage
+                            mob.health-=round(mob.damage*player.reflection/100)
                             mob.cooldown=100
-                            player.hp-=mob.damage
                         else:
                             mob.cooldown=max(0,mob.cooldown-1)
+                    game.mobs.update(game.spawn_queue)
                     for mob_id in game.dead:
                         game.kill(mob_id)
+                    for mob_id in game.despawn_queue:
+                        game.despawn(mob_id)
                     player()
                     if player.hp<=0:
-                        running=False
-                    if game.level==21:
                         running=False
                     display()
                 if keys[pg.K_p]:
@@ -291,7 +372,13 @@ def loop():
                 game.time+=1
                 if game.level==11:
                     dark_orb.name='Dark Orb'
-    display_score()
+                if player.armor>=50 and not player.can_guard:
+                    player.evolve()
+                if game.mode.debug and keys[pg.K_RCTRL]:
+                    debug_mode()
+                    paused=False
+    pg.mixer.music.stop()
+    game_end()
 
 def display_score():
     screen.fill((0,60,50))
@@ -311,6 +398,18 @@ def display_score():
     location=level.get_rect(center=(960,600))
     screen.blit(level,location)
     pg.display.flip()
+    running=True
+    pg.time.delay(500)
+    while running:
+        for event in pg.event.get():
+            if event.type==pg.QUIT:
+                running=False
+        keys=pg.key.get_pressed()
+        if (keys[pg.K_LCTRL] and keys[pg.K_q]) or keys[pg.K_RETURN] or keys[pg.K_ESCAPE]:
+            running=False
+
+def game_end():
+    display_stats(True)
     running=True
     pg.time.delay(500)
     while running:

@@ -87,14 +87,21 @@ wraith=mob(
     xp=75,
     mob_type='wraith',
     ranged={
-        'projectile':'evil_orb',
+        'projectile':"""projectile(
+ai=forward(5,is_hostile=True),
+health=25,
+loot=loot_table(items={'dark_orb':1,'energy':3,'void':10},drops=3),
+texture='evil_orb',
+damage=15,
+mob_type='orb'
+)""",
         'fire_rate':0.25
     }
 )
 snake=mob(
     ai=ai(is_hostile=True,max_distance=player.width//2-1,speed=2.5),
     health=50,
-    loot=loot_table(items={'meat':5,'energy':2,'scale':1},drops=2),
+    loot=loot_table(items={'meat':4,'energy':1,'scale':2},drops=2),
     texture='snake',
     damage=9,
     xp=63,
@@ -112,7 +119,7 @@ large_tree_man=mob(
 sheep=mob(
     ai=ai(is_hostile=False,max_distance=1000,min_distance=800,speed=0.5),
     health=15,
-    loot=loot_table(items={'meat':4,'void':1},drops=3),
+    loot=loot_table(items={'meat':4,'void':1,'wool':2},drops=3),
     texture='shep_',
     xp=5,
     mob_type='sheep'
@@ -134,4 +141,23 @@ haunter=mob(
     damage=15,
     xp=100,
     mob_type='haunter'
+)
+hot_rock=mob(
+    ai=ai_line(is_hostile=True,speed=3.5),
+    health=50,
+    loot=loot_table(items={'marble':1},drops=3),
+    texture='hot_rock',
+    shape='hot_rock_mask',
+    damage=25,
+    xp=100,
+    mob_type='hot_rock'
+)
+crying_cherub=mob(
+    ai=creep_ai(is_hostile=True,distance=50,speed=2),
+    health=100,
+    loot=loot_table(items={'marble':1}),
+    texture='cherub',
+    damage=10,
+    xp=70,
+    mob_type='crying_cherub'
 )
