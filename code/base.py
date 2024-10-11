@@ -481,7 +481,8 @@ class mob:
             mob_type:str='none',
             death_sound:str='none',
             xp:int=1,
-            damage:int=1
+            damage:int=1,
+            zombie=None
     ):
         current_frame = inspect.currentframe()
         caller_frame = inspect.getouterframes(current_frame, 2)
@@ -556,6 +557,7 @@ class mob:
         self.texture=self.textures['right']
         self.shape=self.shapes['right']
         self.damage=damage
+        self.zombie=zombie
 
 class loot_table:
     class item:

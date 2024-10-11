@@ -445,7 +445,6 @@ def debug_mode():
         for event in game.events:
             if event.type==pg.QUIT:
                 running=False
-                return
         text=box()
         if text!=None:
             try:
@@ -455,3 +454,6 @@ def debug_mode():
             return
         if keys[pg.K_ESCAPE]:
             return
+        if keys[pg.K_LCTRL] and keys[pg.K_q]:
+            running=False
+    return
