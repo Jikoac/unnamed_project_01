@@ -293,8 +293,12 @@ def loop():
                     running=False
                 if keys[pg.K_p] and keys[pg.K_LCTRL] and game.mode.photo:
                     photo_mode=True
-                if keys[pg.K_ESCAPE] and keys[pg.K_LCTRL]:
+                if keys[pg.K_F6]:
                     photo_mode=False
+                if keys[pg.K_LCTRL] and keys[pg.K_F12]:
+                    game.mode.debug=True
+                    game.mode.photo=True
+                    player.can_shield=True
                 if paused:
                     player.control.get_select()
                     player.control.move_mouse()
