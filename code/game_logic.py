@@ -258,6 +258,7 @@ def scroll():
                 game.scroll_items=0
 
 def loop():
+    controller=False
     running=True
     paused=False
     fullscreen=True
@@ -277,12 +278,14 @@ def loop():
                         screen=pg.display.set_mode((1920,1080),pg.FULLSCREEN|pg.DOUBLEBUF|pg.HWSURFACE)
                     else:
                         screen=pg.display.set_mode((1920,1080),pg.DOUBLEBUF|pg.HWSURFACE)
-            elif event.type==pg.MOUSEBUTTONDOWN or event.type==pg.MOUSEWHEEL:
+            elif event.type==pg.MOUSEBUTTONDOWN or event.type==pg.MOUSEWHEEL or event.type==pg.JOYBUTTONDOWN or event.type==pg.JOYBUTTONUP or event.type==pg.JOYAXISMOTION:
                 game.event_cache.append(event)
             elif event.type == pg.ACTIVEEVENT:
                 if event.state == pg.APPACTIVE:
                     if event.gain == 0 and fullscreen:
                         paused=True
+            elif event.type==pg.JOYDEVICEREMOVED:
+                controller=False
             elif event.type==game_tick:
                 game.get_clicked()
                 game.dead=[]
@@ -291,6 +294,10 @@ def loop():
                 if keys[pg.K_LCTRL] and keys[pg.K_q]:
                     running=False
                 if paused:
+                    if pg.joystick.get_count()>0 and not controller:
+                        pg.joystick.Joystick(0).init()
+                        print('A')
+                        controller=True
                     player.control.get_select()
                     player.control.move_mouse()
                     pg.mouse.set_visible(True)

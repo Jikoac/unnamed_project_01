@@ -7,6 +7,7 @@ import sys
 
 pg.init()
 pg.mixer.init()
+pg.joystick.init()
 screen=pg.display.set_mode((1920,1080),pg.FULLSCREEN|pg.DOUBLEBUF|pg.HWSURFACE)
 
 def flip_mask(mask:pg.mask.Mask):
@@ -126,6 +127,7 @@ class game_player:
                 self.select=False
                 self.select_held=False
             def __call__(self):
+                self.controller()
                 keys=pg.key.get_pressed()
                 if keys[pg.K_d]:
                     self.move='right'
@@ -146,6 +148,32 @@ class game_player:
                     self.shield=True
                 else:
                     self.shield=False
+            def controller(self):
+                self.move='none'
+                for event in game.event_cache:
+                    if event.type==pg.JOYBUTTONDOWN:
+                        if event.button==pg.CONTROLLER_BUTTON_B:
+                            self.jump=True
+                        elif event.button==pg.CONTROLLER_BUTTON_Y:
+                            self.attack=True
+                        elif event.button==pg.CONTROLLER_BUTTON_X:
+                            self.shield=True
+                        else:
+                            print(event.button)
+                    elif event.type==pg.JOYBUTTONUP:
+                        if event.button==pg.CONTROLLER_BUTTON_B:
+                            self.jump=False
+                        if event.button==pg.CONTROLLER_BUTTON_Y:
+                            self.attack=False
+                        if event.button==pg.CONTROLLER_BUTTON_X:
+                            self.shield=False
+                    elif event.type==pg.JOYAXISMOTION:
+                        if event.axis==0:
+                            if event.value<=-0.2:
+                                self.move='left'
+                            elif event.value>=0.2:
+                                self.move='right'
+                return
             def get_select(self):
                 self.select=False
                 keys=pg.key.get_pressed()
@@ -363,7 +391,7 @@ class game_class:
         'esc':key(),
         'pause':key(pg.K_PAUSE)
     }
-    events=[]
+    events:list[pg.event.Event]=[]
     scroll=0
     scroll_items=0
     dead=[]
@@ -398,7 +426,7 @@ class game_class:
         21:100000,
         22:150000
     }
-    event_cache=[]
+    event_cache:list[pg.event.Event]=[]
     despawn_queue=[]
     music=False
     #screen=screen
