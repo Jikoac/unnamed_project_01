@@ -36,6 +36,7 @@ class path:
         self.texture=self.subpath(self.asset+'textures','.png')
         self.sound=self.subpath(self.asset+'sounds','.mp3')
         self.mod=self.subpath(self.main+'mods','.py')
+        self.data=self.subpath(self.main+'data','')
     def __call__(self,file):
         return self.main+'/'+file
     class mod_path(subpath):
@@ -387,6 +388,8 @@ class game_class:
     def get_clicked(self):
         for key in self.keys.values():
             key()
+    def summon(mob,x,y,):
+        return
 
 
 game=game_class()
@@ -710,6 +713,9 @@ class mob_instance(mob):
         if self.health<=0 and self.max_health:
             return True
         return False
+    def __format__(self,format_spec):
+        if format_spec=='data':
+            return f'game'
 class spawn_rule:
     def __init__(self,
             chance:float=1,
