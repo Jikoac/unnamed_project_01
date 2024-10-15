@@ -391,7 +391,6 @@ class game_class:
         debug=False
         photo=False
     keys={
-        'l_mouse':test_mouse_click(),
         'esc':key(),
         'pause':key(pg.K_PAUSE)
     }
@@ -460,7 +459,6 @@ class game_class:
     def get_clicked(self):
         for key in self.keys.values():
             key()
-
 
 game=game_class()
 
