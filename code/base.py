@@ -49,6 +49,16 @@ class path:
             self.direct=str(self.main)
             self.primary=path.subpath(self.direct,'')
             self.extension='.py'
+    class data_path(subpath):
+        def __init__(self,name):
+            self.main=path.subpath(path.data+name,'')
+            self.stat=self.main+'stats'
+            self.mob=self.main+'mobs'
+            self.upgrade=self.main+'upgrades'
+            self.mod=self.main+'mods'
+            self.name=self.main+'name'
+            self.direct=str(self.main)
+            self.extension=''
     def __add__(self,other):
         return self.main+'/'+other
 
@@ -863,3 +873,143 @@ resize=pg.transform.scale
 
 def add(x,y):
     return tuple([x[i]+y[i] for i in range(len(x))])
+
+def binary(value:int|str=0,length:int=8):
+    '''Convert a string or int to binary'''
+    if isinstance(value,str):
+        out=''
+        for l in value:
+            out+=f'{ord(l):0{length}b}'
+        return out
+    return f'{value:0{length}b}'
+
+def total(x):
+    '''Returns a range of the length of \'x\''''
+    return(list(range(len(x))))
+
+class bitset:
+    '''A class for data stored in binary, 
+the special keys are:
+    any: any bit in the data, 
+    all: all bits in the data, 
+    int: the data as an integer, 
+    len: the length of the data, 
+    bin: the data as binary, 
+    range: the range keywords, 
+    map: the keywords, 
+    color: the data as a color'''
+    def __init__(self, length:int=8,*keys:str):
+        self.data = 0
+        self.length = length
+        bit_range=range(length)
+        self.keys=dict(zip(keys,bit_range))
+        self.ranges:dict[str,tuple[int,int]]={}
+
+    def __call__(self, length:int):
+        if length < self.length:
+            self.data = min(self.data,(2**length)-1)
+        self.length = length
+
+    def __getitem__(self, index:int):
+        if type(index)==str:
+            if index in self.ranges:
+                index=self.ranges[index]
+            elif index in self.keys:
+                index=self.keys[index]
+            else:
+                raise KeyError(index)
+        if isinstance(index,tuple):
+            index=range(index[0],index[1])
+        if index==any:
+            return any(f'{self.data:0{self.length}b}')
+        elif index==all:
+            return all(f'{self.data:0{self.length}b}')
+        elif index==int:
+            return self.data
+        elif index==len:
+            return self.length
+        elif index==bin:
+            return repr(self)
+        elif index==range:
+            return self.ranges
+        elif index==map:
+            return self.keys
+        elif isinstance(index,range):
+            value=[]
+            for i in index:
+                value.append(str(int((self.data >> i) & 1 == 1)))
+            value.reverse()
+            return ''.join(value)
+        elif index >= self.length:
+            raise IndexError("Index out of range")
+        else:
+            return (self.data >> index) & 1 == 1
+
+    def __setitem__(self, index:int|None, value:int):
+        if type(index)==str:
+            if index in self.ranges:
+                index=self.ranges[index]
+            elif index in self.keys:
+                index=self.keys[index]
+            else:
+                raise KeyError(index)
+        if isinstance(index,tuple):
+            index=range(index[0],index[1])
+        if index==any:
+            index=randrange(self.length)
+        if index==all:
+            self.data=int('0b'+(str(int(value))*self.length),base=2)
+        elif index==len:
+            self(value)
+        elif index==int:
+            self.data=value
+            self.length=max(self.length,len(repr(self)))
+        elif index==bin:
+            self.data=int(str(value),base=2)
+            self.length=max(self.length,len(repr(self)))
+        elif index==range:
+            self.ranges=value
+        elif index==map:
+            self.keys=value
+        elif isinstance(index,range):
+            if max(index) >= self.length:
+                raise IndexError("Index out of range")
+            value=str(value)
+            for i in index:
+                if int(value[len(index)-1-(i-min(index))]):
+                    self.data |= (1 << i)
+                else:
+                    self.data &= ~(1 << i)
+        else:
+            if index >= self.length:
+                raise IndexError("Index out of range")
+            if value:
+                self.data |= (1 << index)
+            else:
+                self.data &= ~(1 << index)
+
+    def __repr__(self):
+        return f'{self.data:0{self.length}b}'
+    
+    def toggle(self,index:str|int=0):
+        self[index]= not self[index]
+
+    def number(self,index:range):
+        if isinstance(index,str):
+            index=self.ranges[index]
+        value=[]
+        for i in index:
+            value.append(str(int((self.data >> i) & 1 == 1)))
+        value.reverse()
+        value=''.join(value)
+        return int(value,base=2)
+    
+    def ascii(self,index:int=0,utf:int=8):
+        return chr(self.number(range(index,index+utf)))
+
+    def assign_character(self,value='a',index:int=0):
+        for i in total(binary(value)):
+            self[index+i]=bool(int(binary(value)[len(binary(value))-1-i]))
+    
+    def toggle(self,index:int=0):
+        self[index]=not self[index]
