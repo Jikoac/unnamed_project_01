@@ -71,23 +71,6 @@ def pause_display():
                         screen.blit(resize(error_texture,(50,50)),(loc+item_loc+game.scroll,850))
                     screen.blit(item_count,(loc+item_loc+game.scroll,925))
                     item_loc+=75
-        if game.level>=upgrade.level and upgrade.max!=0:
-            screen.blit(resize(upgrade.texture,(500,500)),(loc+game.scroll,250))
-            upgrade_name=font.render(upgrade.name,True,upgrade.name_color)
-            screen.blit(upgrade_name,(loc+game.scroll,800))
-            if upgrade.show_uses:
-                uses_tooltip(loc+game.scroll,250,500,500,str(upgrade.max))
-            item_loc=0
-            for item in upgrade.items:
-                item_count=font.render(str(upgrade.items[item]),True,(255,255,255))
-                try:item=eval(item)
-                except:None
-                try:
-                    screen.blit(resize(item.texture,(50,50)),(loc+item_loc+game.scroll,850))
-                except:
-                    screen.blit(resize(error_texture,(50,50)),(loc+item_loc+game.scroll,850))
-                screen.blit(item_count,(loc+item_loc+game.scroll,925))
-                item_loc+=75
             loc+=550
     score=font.render(str(player.xp),True,(0,255,0))
     screen.blit(score,(1895-score.get_width(),75))
@@ -321,7 +304,7 @@ def loop():
                         paused=False
                     up_loc=50
                     for upgrade in upgrades:
-                        if game.level>=upgrade.level and upgrade.max!=0:
+                        if game.level>=upgrade.level and upgrade.max!=0 and up_loc+game.scroll:
                             if button(up_loc+game.scroll,250,500,500):
                                 if upgrade():
                                     player.jump_sound.play()
