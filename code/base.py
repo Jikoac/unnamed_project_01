@@ -65,6 +65,10 @@ class path:
 
 path=path()
 
+start_screen=pg.image.load(path.texture('start'))
+screen.blit(start_screen,(0,0))
+pg.display.flip()
+
 class game_player:
     class player_shield:
         def __init__(self):
@@ -210,6 +214,21 @@ class game_player:
         self.shield=self.player_shield()
         self.knockback=1
         self.jump_sound=pg.mixer.Sound(path.sound('jump'))
+        self.armor=0
+        self.reflection=0
+        self.armor_textures={
+            'right':pg.image.load(path.texture('armor')),
+            'left':pg.transform.flip(pg.image.load(path.texture('armor')),True,False)
+        }
+        self.full_armor_textures={
+            'right':pg.image.load(path.texture('full_armor')),
+            'left':pg.transform.flip(pg.image.load(path.texture('full_armor')),True,False)
+        }
+        self.full_armor_shapes={
+            'right':pg.mask.from_surface(pg.image.load(path.texture('full_armor'))),
+            'left':flip_mask(pg.mask.from_surface(pg.image.load(path.texture('full_armor'))))
+        }
+        self.can_guard=False
     def __call__(self):
         self.control()
         if self.control.jump>0:
@@ -246,6 +265,17 @@ class game_player:
             self.shield()
         else:
             self.shield.active=False
+    def coord_x(self):
+        return self.x+(self.width/2)
+    def evolve(self):
+        self.textures=self.full_armor_textures
+        self.shapes=self.full_armor_shapes
+        self.height=212
+        self.can_guard=True
+        self.texture=self.textures[self.facing]
+    def name_width(self):
+        name=font.render(f'{str(game.level)}. {player.name}',True,(255,255,255))
+        return name.get_width()
 player=game_player()
 
 class between:
@@ -337,6 +367,9 @@ class test_mouse_click:
             self._click = False
 
 class game_class:
+    class mode:
+        debug=False
+        photo=False
     keys={
         'l_mouse':test_mouse_click(),
         'esc':key(),
@@ -346,6 +379,7 @@ class game_class:
     scroll=0
     scroll_items=0
     dead=[]
+    spawn_queue={}
     mobs={}
     mob_count=0
     time=0
@@ -368,7 +402,7 @@ class game_class:
         13:20000,
         14:25000,
         15:30000,
-        15:35000,
+        16:35000,
         17:40000,
         18:50000,
         19:60000,
@@ -377,10 +411,17 @@ class game_class:
         22:150000
     }
     event_cache=[]
+    despawn_queue=[]
+    music=False
     #screen=screen
-    def spawn(self,mob,x,y,facing='right'):
+    def spawn(self,mob,x,y,facing:str|None=None,queue:bool=False):
+        if facing==None:
+            facing=x*toward_player()
         number='0'*(8-len(hex(self.mob_count)))+hex(self.mob_count).replace('0x','')
-        self.mobs.update({number:mob_instance(mob,x,y,number,facing)})
+        if not queue:
+            self.mobs.update({number:mob_instance(mob,x,y,number,facing)})
+        else:
+            self.spawn_queue.update({number:mob_instance(mob,x,y,number,facing)})
         self.mob_count+=1
     def kill(self,mob_id):
         self.mobs[mob_id].give_loot()
@@ -560,6 +601,28 @@ class ai_line:
         self.special_ai='straight_line'
         self.is_hostile=is_hostile
 
+class creep_ai:
+    def __init__(self,
+                speed:float|int=1,
+                is_hostile:bool=True,
+                distance:int=50
+                ):
+        self.speed=speed
+        self.is_hostile=is_hostile
+        self.special_ai='creep'
+        self.distance=distance
+
+class sneak_ai:
+    def __init__(self,
+                speed:float|int=1,
+                is_hostile:bool=False,
+                distance:int=1500
+                ):
+        self.speed=speed
+        self.is_hostile=is_hostile
+        self.special_ai='sneak'
+        self.distance=distance
+
 class projectile:
     def __init__(self,
             ai:str='ai_line(2)',
@@ -610,7 +673,7 @@ class projectile:
         self.texture_offset=texture_offset
         ranged_data={
             'projectile':'None',
-            'fire_rate':1,
+            'fire_rate':0,
             'offset':(0,0),
             'sound':'none'
             }
@@ -667,8 +730,6 @@ class item:
             self.name=name
 
 class mob_instance(mob):
-    def __call__(self):
-        return
     def __init__(self,data:mob,x:float,y:float,mob_id:str='000000',facing:str='right'):
         self.__dict__.update(data.__dict__)
         self.x=x
@@ -679,9 +740,9 @@ class mob_instance(mob):
         self.facing=facing
         self.cooldown=0
     def shoot(self):
-        if self.fire_rate:
+        if self.fire_rate and isinstance(self.projectile,projectile):
             if (game.time%(100//self.fire_rate))==(self.spawned%(100//self.fire_rate)) and game.time>self.spawned:
-                game.spawn(projectile,self.x+(self.width/2)-(projectile.width/2)+self.projectile_offset[0],self.y+(self.height/2)-(projectile.height/2)+self.projectile_offset[1],self.facing)
+                game.spawn(self.projectile,self.x+(self.width/2)-(self.projectile.width/2)+self.projectile_offset[0],self.y+(self.height/2)-(self.projectile.height/2)+self.projectile_offset[1],self.facing,True)
                 pg.mixer.Sound.play(self.shoot_sound)
     def collide(self, other):
         offset_x = other.x - self.x
@@ -716,6 +777,14 @@ class mob_instance(mob):
                 self.x+=self.speed
             else:
                 self.x-=self.speed
+        elif self.special_ai=='creep':
+            self.facing=self@toward_player()
+            if self.unwatched():
+                self.walk()
+        elif self.special_ai=='sneak':
+            self.facing=self@away_from_player()
+            if self.unwatched():
+                self.walk()
         elif self.special_ai=='custom':
             self.ai
         self.texture=self.textures[self.facing]
@@ -728,6 +797,23 @@ class mob_instance(mob):
     def __format__(self,format_spec):
         if format_spec=='data':
             return f'({self.type},{self.x},{self.y},"{self.facing}","{self.id}",{self.health})'
+    def walk(self):
+        if self.facing=='left':
+            self.x-=self.speed
+        else:
+            self.x+=self.speed
+    def coord_x(self):
+        return self.x+(self.width/2)
+    def distance(self):
+        return abs(self.coord_x()-player.coord_x())
+    def watched(self):
+        if self.coord_x()<player.coord_x() and player.facing=='left':
+            return True
+        elif self.coord_x()>player.coord_x() and player.facing=='right':
+            return True
+        return False
+    def unwatched(self):
+        return not self.watched()
 class spawn_rule:
     def __init__(self,
             chance:float=1,
@@ -801,6 +887,14 @@ def strike_upgrade(power:int=1):
     def wrapper():
         player.attack.speed+=power
     return wrapper
+def armor_upgrade(power:int=1):
+    def wrapper():
+        player.armor+=power
+    return wrapper
+def reflection_upgrade(power:int=1):
+    def wrapper():
+        player.reflection+=power
+    return wrapper
 def multiple(*functions):
     def output():
         for f in functions:
@@ -855,6 +949,15 @@ class upgrade:
                 player.loot[i]-=self.items[i]
             return True
         return False
+    def is_affordable(self):
+        affordable=True
+        for i in self.items:
+            try:
+                if player.loot[i]<self.items[i]:
+                    affordable=False
+            except:
+                affordable=False
+        return affordable
 
 forward=ai_line
 no_ai=ai(speed=0)
@@ -867,6 +970,8 @@ error_texture=pg.image.load(path.texture('deny'))
 heart=pg.image.load(path.texture('lil_heart'))
 
 font=pg.font.SysFont('Noto Sans',25)
+font_large=pg.font.SysFont('Noto Sans',50)
+font_xl=pg.font.SysFont('Noto Sans',100)
 
 generators=[]
 upgrades=[]
@@ -875,6 +980,74 @@ resize=pg.transform.scale
 
 def add(x,y):
     return tuple([x[i]+y[i] for i in range(len(x))])
+
+class toward_player:
+    def __rmul__(self,it:float|int|mob_instance):
+        if isinstance(it,mob_instance):
+            if it.x<player.x:
+                return 'right'
+            return 'left'
+        else:
+            if it<player.x:
+                return 'right'
+            return 'left'
+    def __rdiv__(self,it:float|int|mob_instance):
+        if isinstance(it,mob_instance):
+            if it.x<player.x:
+                return 'left'
+            return 'right'
+        else:
+            if it<player.x:
+                return 'left'
+            return 'right'
+    def __rmatmul__(self,it:float|int|mob_instance):
+        return it*self
+    def __rmod__(self,it:float|int|mob_instance):
+        return it/self
+    def __eq__(self,it:mob_instance):
+        if it.x<player.x and it.facing=='right':
+            return True
+        elif it.x>player.x and it.facing=='left':
+            return True
+        return False
+
+class away_from_player:
+    def __eq__(self,it:mob_instance):
+        return it!=toward_player()
+    def __rmatmul__(self,it:float|int|mob_instance):
+        return it/toward_player()
+    def __rmul__(self,it:float|int|mob_instance):
+        return it/toward_player()
+    def __rdiv__(self,it:float|int|mob_instance):
+        return it@toward_player()
+    def __rmod__(self,it:float|int|mob_instance):
+        return it@toward_player()
+
+def has_enough(item,quantity):
+    for i in player.loot:
+        if i==item:
+            if player.loot[i]>=quantity:
+                return True
+    return False
+
+def affordable_upgrades():
+    return len([upgrade for upgrade in upgrades if upgrade.is_affordable()])
+
+pg.mixer.music.load(path.sound('none'))
+
+class rounded:
+    def __init__(self,value:int=0):
+        self.value=value
+        if value>0:
+            self.degree=10**value
+        elif value<0:
+            self.degree=1/10**value
+        else:
+            self.degree=1
+    def __rmul__(self,other):
+        return round(other*self.degree)/self.degree
+    def __rmatmul__(self,other):
+        return other*self
 
 def binary(value:int|str=0,length:int=8):
     '''Convert a string or int to binary'''
