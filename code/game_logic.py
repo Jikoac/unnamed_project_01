@@ -402,7 +402,6 @@ def loop():
     pg.mixer.music.stop()
     save_data(os.getlogin())
     game_end()
-    display_score()
 
 def display_score():
     screen.fill((0,60,50))
