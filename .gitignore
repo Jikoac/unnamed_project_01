@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.vscode/
+.AddCompLib/
+data/
+code/__pycache__/
