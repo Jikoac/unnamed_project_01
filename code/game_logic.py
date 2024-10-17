@@ -75,18 +75,6 @@ def pause_display():
 #        loc+=150
     update()
 
-def button(x, y, width, height, color=None):
-    box_rect = pg.Rect(x, y, width, height)
-    if color!=None:
-        pg.draw.rect(screen, color, box_rect)
-    for event in game.event_cache:
-        if event.type==pg.MOUSEBUTTONDOWN and event.button==1:
-            if pg.mouse.get_pos()==in_rect(box_rect):
-                return True
-    if player.control.select and pg.mouse.get_pos()==in_rect(box_rect):
-        return True
-    return False
-
 def highlight(x, y, width, height, text=''):
     box_rect = pg.Rect(x, y, width, height)
     if pg.mouse.get_pos()==in_rect(box_rect):

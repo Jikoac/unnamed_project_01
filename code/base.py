@@ -857,3 +857,15 @@ resize=pg.transform.scale
 
 def add(x,y):
     return tuple([x[i]+y[i] for i in range(len(x))])
+
+def button(x, y, width, height, color=None):
+    box_rect = pg.Rect(x, y, width, height)
+    if color!=None:
+        pg.draw.rect(screen, color, box_rect)
+    for event in game.event_cache:
+        if event.type==pg.MOUSEBUTTONDOWN and event.button==1:
+            if pg.mouse.get_pos()==in_rect(box_rect):
+                return True
+    if player.control.select and pg.mouse.get_pos()==in_rect(box_rect):
+        return True
+    return False
