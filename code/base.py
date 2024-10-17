@@ -57,6 +57,7 @@ class path:
             self.upgrade=self.main+'upgrades'
             self.mod=self.main+'mods'
             self.name=self.main+'name'
+            self.loot=self.main+'loot'
             self.direct=str(self.main)
             self.extension=''
     def __add__(self,other):
@@ -398,8 +399,9 @@ class game_class:
     def get_clicked(self):
         for key in self.keys.values():
             key()
-    def summon(mob,x,y,):
-        return
+    def summon(self,mob,x,y,facing,id,hp):
+        self.mobs.update({id:mob_instance(mob,x,y,id,facing)})
+        self.mobs[id].health=hp
 
 
 game=game_class()
@@ -725,7 +727,7 @@ class mob_instance(mob):
         return False
     def __format__(self,format_spec):
         if format_spec=='data':
-            return f'game'
+            return f'({self.type},{self.x},{self.y},"{self.facing}","{self.id}",{self.health})'
 class spawn_rule:
     def __init__(self,
             chance:float=1,
@@ -813,7 +815,7 @@ class upgrade:
             name:str='Upgrade',
             texture:str='none',
             level:int=1,
-            max:int=10**100,
+            max:int=-1,
             show_uses:bool=False,
             name_color=(255,255,255)
     ):
@@ -898,12 +900,17 @@ the special keys are:
     range: the range keywords, 
     map: the keywords, 
     color: the data as a color'''
-    def __init__(self, length:int=8,*keys:str):
+    def __init__(self, length:int=8,*keys:str,**kwargs):
         self.data = 0
         self.length = length
         bit_range=range(length)
         self.keys=dict(zip(keys,bit_range))
         self.ranges:dict[str,tuple[int,int]]={}
+        if 'ranges' in kwargs:
+            self.ranges.update(kwargs['ranges'])
+        if 'keys' in kwargs:
+            self.keys.update(kwargs['keys'])
+        self.from_str,self.from_bytes=self.new_methods()
 
     def __call__(self, length:int):
         if length < self.length:
@@ -997,6 +1004,8 @@ the special keys are:
     def number(self,index:range):
         if isinstance(index,str):
             index=self.ranges[index]
+        if isinstance(index,tuple):
+            index=range(index[0],index[1])
         value=[]
         for i in index:
             value.append(str(int((self.data >> i) & 1 == 1)))
@@ -1010,6 +1019,50 @@ the special keys are:
     def assign_character(self,value='a',index:int=0):
         for i in total(binary(value)):
             self[index+i]=bool(int(binary(value)[len(binary(value))-1-i]))
+
+    def bytes(self):
+        return int(repr(self.data), 2).to_bytes((len(repr(self.data)) + 7) // 8, byteorder='big')
     
-    def toggle(self,index:int=0):
-        self[index]=not self[index]
+    def from_bytes(bytes:bytes=int(0).to_bytes()):
+        self=bitset(len(bytes)*8)
+        self.data=int.from_bytes(bytes)
+        self.adjust()
+        return self
+
+    def str(self,utf:int=8):
+        string=''
+        for i in range(0,self.length,utf):
+            string+=self.ascii(i,utf)
+        return string
+    
+    def from_str(string:str='',utf:int=8):
+        self=bitset(len(string)*utf)
+        for i in range(len(string)):
+            self.assign_character(string[i],i*utf)
+        self.adjust()
+        return self
+    
+    def adjust(self,can_extend:bool=True,can_shorten:bool=False):
+        if can_extend:
+            self.length=max(self.length,len(repr(self.data)))
+        if can_shorten:
+            self.length=min(self.length,len(repr(self.data)))
+
+    def new_methods(self):
+        def str_method(string:str,utf:int=8):
+            data=bitset(len(string)*utf)
+            for i in range(len(string)):
+                data.assign_character(string[i],i*utf)
+            self.adjust()
+            self.data=data.data
+        def bytes_method(bytes:bytes):
+            data=bitset(len(bytes)*8)
+            data.data=int.from_bytes(bytes)
+            self.data=data.data
+            self.adjust()
+        return str_method,bytes_method
+
+def is_positive(number:int|float):
+    if number>=0:
+        return True
+    return False

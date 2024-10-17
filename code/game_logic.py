@@ -1,4 +1,4 @@
-from mod_import_config import *
+from data_handling import *
 
 def update(image:pg.Surface=none,pos:tuple=(0,0)):
     screen.blit(image,pos)
@@ -45,7 +45,7 @@ def pause_display():
     display(False)
     loc=50
     for upgrade in upgrades:
-        if game.level>=upgrade.level and upgrade.max>0:
+        if game.level>=upgrade.level and upgrade.max!=0:
             screen.blit(resize(upgrade.texture,(500,500)),(loc+game.scroll,250))
             upgrade_name=font.render(upgrade.name,True,upgrade.name_color)
             screen.blit(upgrade_name,(loc+game.scroll,800))
@@ -178,7 +178,7 @@ def start():
         pg.display.flip()
         name=name_box()
         if name!=None:
-            player.name='Player'
+            player.name=None
             if name:
                 player.name=name
             running=False
@@ -198,6 +198,11 @@ def scroll():
                 game.scroll_items=0
 
 def loop():
+    try:
+        load_data(os.getlogin())
+    except:
+        print(f'Welcome to Sword: A World Of Chaos, {player.name}')
+        if not player.name:player.name=os.getlogin()
     running=True
     paused=False
     fullscreen=True
@@ -237,7 +242,7 @@ def loop():
                         paused=False
                     up_loc=50
                     for upgrade in upgrades:
-                        if game.level>=upgrade.level and upgrade.max>0:
+                        if game.level>=upgrade.level and upgrade.max!=0:
                             if button(up_loc+game.scroll,250,500,500):
                                 if upgrade():
                                     player.jump_sound.play()
@@ -291,6 +296,7 @@ def loop():
                 game.time+=1
                 if game.level==11:
                     dark_orb.name='Dark Orb'
+    save_data(os.getlogin())
     display_score()
 
 def display_score():
