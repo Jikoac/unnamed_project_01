@@ -23,15 +23,15 @@ def binary_data():
     data['speed']=binary(round(player.speed*20),16)
     data['xp_boost']=binary(round(player.xp_boost*20))
     data['mob_count']=binary(game.mob_count,64)
-#    data['armor']=binary(player.armor)
+    data['armor']=binary(player.armor)
     data['jump_height']=binary(player.jump_height)
     data['range']=binary(player.range)
-    # data['reflection']=binary(player.reflection)
+    data['reflection']=binary(player.reflection)
     data['strike']=binary(round(player.attack.speed*2),16)
     data['can_shield']=player.can_shield
-    # data['debug']=game.mode.debug
-    # data['photo']=game.mode.photo
-    # data['photo_mode']=game.photo_mode
+    data['debug']=game.mode.debug
+    data['photo']=game.mode.photo
+    data['photo_mode']=game.photo_mode
     data['time']=binary(game.time,64)
     data['pos_x']=is_positive(player.x)
     data['facing']=1 if player.facing=='right' else 0
@@ -52,15 +52,15 @@ def extract_from_binary(data:bitset):
         player.speed=data.number('speed')/20
         player.xp_boost=data.number('xp_boost')/20
         game.mob_count=data.number('mob_count')
-    #    player.armor=data.number('armor')
+        player.armor=data.number('armor')
         player.jump_height=data.number('jump_height')
         player.range=data.number('range')
-        # player.reflection=data.number('reflection')
+        player.reflection=data.number('reflection')
         player.attack.speed=data.number('strike')/2
         player.can_shield=data['can_shield']
-        # game.mode.debug=data['debug']
-        # game.mode.photo=data['photo']
-        # game.photo_mode=data['photo_mode']
+        game.mode.debug=data['debug']
+        game.mode.photo=data['photo']
+        game.photo_mode=data['photo_mode']
         game.time=data.number('time')
         player.facing='right' if data['facing'] else 'left'
     return
