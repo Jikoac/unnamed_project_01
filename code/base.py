@@ -7,7 +7,7 @@ import sys
 
 pg.init()
 pg.mixer.init()
-screen=pg.display.set_mode((1920,1080),pg.FULLSCREEN|pg.DOUBLEBUF|pg.HWSURFACE)
+screen=pg.display.set_mode((1920,1080),pg.FULLSCREEN|pg.DOUBLEBUF|pg.HWSURFACE|pg.SCALED)
 
 def flip_mask(mask:pg.mask.Mask):
     flipped_mask = pg.mask.Mask((mask.get_size()))

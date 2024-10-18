@@ -275,9 +275,9 @@ def loop():
                 if event.key==pg.K_f:
                     fullscreen=not fullscreen
                     if fullscreen:
-                        screen=pg.display.set_mode((1920,1080),pg.FULLSCREEN|pg.DOUBLEBUF|pg.HWSURFACE)
+                        pg.display.set_mode((1920,1080),pg.FULLSCREEN|pg.DOUBLEBUF|pg.HWSURFACE|pg.SCALED)
                     else:
-                        screen=pg.display.set_mode((1920,1080),pg.DOUBLEBUF|pg.HWSURFACE)
+                        pg.display.set_mode((1920,1080),pg.DOUBLEBUF|pg.HWSURFACE|pg.SCALED)
             elif event.type==pg.MOUSEBUTTONDOWN or event.type==pg.MOUSEWHEEL:
                 game.event_cache.append(event)
             elif event.type == pg.ACTIVEEVENT:
