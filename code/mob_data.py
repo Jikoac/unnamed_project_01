@@ -161,3 +161,12 @@ crying_cherub=mob(
     xp=70,
     mob_type='crying_cherub'
 )
+boss_test=mob(
+    ai=creep_ai(is_hostile=True,distance=50,speed=2),
+    health=1000,
+    loot=loot_table(items={'dark_orb':1},drops=10),
+    texture='wanderer_wraith',
+    damage=50,
+    xp=250,
+    mob_type='boss_test'
+)

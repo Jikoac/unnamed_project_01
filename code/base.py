@@ -445,6 +445,7 @@ class game_class:
     event_cache=[]
     despawn_queue=[]
     music=False
+    photo_mode=False
     #screen=screen
     def spawn(self,mob,x,y,facing:str|None=None,queue:bool=False):
         if facing==None:

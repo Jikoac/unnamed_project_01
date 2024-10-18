@@ -246,7 +246,6 @@ def scroll():
                 game.scroll_items=0
 
 def loop():
-    photo_mode=False
     try:
         load_data(os.getlogin())
     except:
@@ -278,6 +277,7 @@ def loop():
                     if event.gain == 0 and fullscreen:
                         paused=True
             elif event.type==game_tick:
+                photo_mode=game.photo_mode
                 game.get_clicked()
                 game.dead=[]
                 game.level_up()
@@ -285,16 +285,15 @@ def loop():
                 if keys[pg.K_LCTRL] and keys[pg.K_q]:
                     running=False
                 if keys[pg.K_p] and keys[pg.K_LCTRL] and game.mode.photo:
-                    photo_mode=True
+                    game.photo_mode=True
                 if keys[pg.K_F6]:
-                    photo_mode=False
+                    game.photo_mode=False
                 if keys[pg.K_LCTRL] and keys[pg.K_F12]:
                     game.mode.debug=True
                     game.mode.photo=True
                     player.can_shield=True
                 if paused:
                     player.control.get_select()
-                    player.control.move_mouse()
                     pg.mouse.set_visible(True)
                     scroll()
                     if game.keys['pause'].click or game.keys['esc'].click:
