@@ -1128,6 +1128,8 @@ the special keys are:
             self.ranges.update(kwargs['ranges'])
         if 'keys' in kwargs:
             self.keys.update(kwargs['keys'])
+        if 'map' in kwargs:
+            self.map(kwargs['map'])
         self.from_str,self.from_bytes=self.new_methods()
 
     def __call__(self, length:int):
@@ -1279,6 +1281,43 @@ the special keys are:
             self.data=data.data
             self.adjust()
         return str_method,bytes_method
+
+    def map(self,map:dict[str,int|range|tuple]|None=None,destroy_old:bool=False,use_bits:bool=True):
+        '''Change and/or return the keys and range keys in the bitset\n
+destroy_old
+    True: Destroy the old keys
+    False: Keep the old keys\n
+use_bits
+    True: Use bit numbers ({'a':1,'b':2,'c':4}) for values
+    False: Use indexes and ranges ({'a':0,'b':(1,3),'c':(3,7)}) for values'''
+        if use_bits:
+            if destroy_old:
+                self.keys={}
+                self.ranges={}
+            if map!=None:
+                index=0
+                for k,v in map.items():
+                    if v==1:
+                        self.keys.update({k:index})
+                    else:
+                        self.ranges.update({k:(index,index+v)})
+                    index+=v
+            maps=dict(self.keys)
+            maps.update(self.ranges)
+            return maps
+        else:
+            if destroy_old:
+                self.keys={}
+                self.ranges={}
+            if map!=None:
+                for k,v in map.items():
+                    if isinstance(v,int):
+                        self.keys.update({k:v})
+                    elif isinstance(v,(range,tuple)):
+                        self.ranges.update({k:v})
+            maps=self.keys
+            maps.update(self.ranges)
+            return maps
 
 def is_positive(number:int|float):
     if number>=0:

@@ -9,12 +9,14 @@ data_ranges={'format':(0,8),'max_hp':(8,16),'hp':(16,24),
             }
 data_keys={'can_shield':280,'debug':281,'photo':282,'photo_mode':283,'pos_x':348,'facing':349}
 
+data_map_00={'format':8,'max_hp':8,'hp':8,'damage':8,'xp':64,'x':32,'y':16,'speed':16,'xp_boost':8,
+            'mob_count':64,'armor':8,'jump_height':8,'range':8,'reflection':8,'strike':16,'can_shield':1,
+            'debug':1,'photo':1,'photo_mode':1,'time':64,'pos_x':1,'facing':1}
+
 def binary_data():
-    data=bitset(350)
-    data[range]=data_ranges
-    data[map]=data_keys
+    data=bitset(350,map=data_map_00)
     data['format']='00000000'
-    data['max_hp']=binary(player.max_hp)
+    data['max_hp']=binary(max(player.max_hp,0))
     data['hp']=binary(player.hp)
     data['damage']=binary(player.damage)
     data['xp']=binary(player.xp,64)
@@ -91,8 +93,7 @@ def load_data(name:str):
     data_path=path.data_path(name)
     with open(data_path.stat,'rb') as file:
         data=bitset.from_bytes(file.read())
-        data[range]=data_ranges
-        data[map]=data_keys
+        data.map(data_map_00)
         if data.number('hp'):
             extract_from_binary(data)
         file.close()
