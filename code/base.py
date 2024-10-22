@@ -432,6 +432,9 @@ class game_class:
     event_cache=[]
     despawn_queue=[]
     music=False
+    stage=1
+    background=pg.image.load(path.texture('background'))
+    ground=pg.image.load(path.texture('ground'))
     #screen=screen
     def spawn(self,mob,x,y,facing:str|None=None,queue:bool=False):
         if facing==None:
@@ -836,7 +839,9 @@ class spawn_rule:
             mob:mob=None,
             min_distance:int=0,
             max_distance:int=960,
-            spawn_height:int=0
+            spawn_height:int=0,
+            min_stage:int=1,
+            max_stage:int=0
     ):
         self.chance=chance
         self.min_level=min_level
@@ -845,9 +850,11 @@ class spawn_rule:
         self.min_distance=min_distance
         self.max_distance=max_distance
         self.spawn_height=spawn_height
+        self.min_stage=min_stage
+        self.max_stage=max_stage
     def __call__(self):
         spawn=False
-        if game.level>=self.min_level:
+        if game.level>=self.min_level and game.stage>=self.min_stage and (game.stage<=self.max_stage or self.max_stage==0):
             try:
                 if game.level<=self.max_level:
                     if not randrange(round(1000/self.chance)):
@@ -925,7 +932,8 @@ class upgrade:
             level:int=1,
             max:int=10**100,
             show_uses:bool=False,
-            name_color=(255,255,255)
+            name_color=(255,255,255),
+            stage:int=1
     ):
         current_frame = inspect.currentframe()
         caller_frame = inspect.getouterframes(current_frame, 2)
@@ -934,6 +942,7 @@ class upgrade:
         self.module=path.mod_path(self.filepath.replace('\\','/').replace('/code/upgrades.py',''))
         self.max=max
         self.show_uses=show_uses
+        self.stage=stage
 
         try:
             self.texture=pg.image.load(self.module.texture(texture))
@@ -1029,9 +1038,16 @@ class away_from_player:
     def __eq__(self,it:mob_instance):
         return it!=toward_player()
     def __rmatmul__(self,it:float|int|mob_instance):
-        return it/toward_player()
+        if isinstance(it,mob_instance):
+            if it.x<player.x:
+                return 'left'
+            return 'right'
+        else:
+            if it<player.x:
+                return 'left'
+            return 'right'
     def __rmul__(self,it:float|int|mob_instance):
-        return it/toward_player()
+        return it@self()
     def __rdiv__(self,it:float|int|mob_instance):
         return it@toward_player()
     def __rmod__(self,it:float|int|mob_instance):
@@ -1048,6 +1064,14 @@ def affordable_upgrades():
     return len([upgrade for upgrade in upgrades if upgrade.is_affordable()])
 
 pg.mixer.music.load(path.sound('none'))
+class experimental:
+    '''This denotes that a feature is experimental,
+and may not work at the moment,
+and is subject to change.'''
+    def __init__(self):
+        '''This denotes that a feature is experimental,
+meaning it may not work at the moment,
+and is subject to change.'''
 
 class rounded:
     def __init__(self,value:int=0):
@@ -1062,3 +1086,22 @@ class rounded:
         return round(other*self.degree)/self.degree
     def __rmatmul__(self,other):
         return other*self
+
+class stage:
+    def __init__(self,number:int,background:str='background',ground:str='ground',music:str|None=None,backdrop:str|experimental='none'):
+        self.background=pg.image.load(path.texture(background))
+        self.ground=pg.image.load(path.texture(ground))
+        self.number=number
+        self.music=music
+        self.backdrop=pg.image.load(path.texture(backdrop))
+    def __call__(self):
+        game.background=self.background
+        game.ground=self.ground
+        game.stage=self.number
+        if self.music!=None:
+            return
+
+snow_stage=stage(2,'background_snow','ground_snow')
+volcano_stage=stage(3,'background_volcanic','ground_volcanic')
+default_stage=stage(1)
+stages=[default_stage,snow_stage,volcano_stage]

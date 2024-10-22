@@ -54,3 +54,8 @@ marble=item(
     name='Marble',
     texture='marble'
     )
+ice_shard=item(
+    item_id='ice_shard',
+    name='Ice Shard',
+    texture='shard_ice'
+    )

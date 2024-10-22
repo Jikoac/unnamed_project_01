@@ -122,7 +122,7 @@ sheep=mob(
     loot=loot_table(items={'meat':4,'void':1,'wool':2},drops=3),
     texture='shep_',
     xp=5,
-    mob_type='sheep'
+    mob_type='sheep',
 )
 farmer_armored=mob(
     ai=ai(is_hostile=True,min_distance=0,max_distance=70,speed=1),
@@ -134,7 +134,7 @@ farmer_armored=mob(
     damage=7
 )
 haunter=mob(
-    ai=ai(is_hostile=True,max_distance=5,speed=2.5),
+    ai=ai(is_hostile=True,max_distance=15,speed=2.5),
     health=200,
     loot=loot_table(items={'dark_orb':1}),
     texture='haunter',
@@ -160,4 +160,39 @@ crying_cherub=mob(
     damage=10,
     xp=70,
     mob_type='crying_cherub'
+)
+sheep_winter=mob(
+    ai=sneak_ai(is_hostile=True,distance=2000,speed=0.75),
+    health=50,
+    loot=loot_table(items={'meat':4,'void':1,'wool':5},drops=4),
+    texture='shep_winter',
+    xp=25,
+    mob_type='sheep_winter',
+)
+mountain_man=mob(
+    ai=ai(is_hostile=True,max_distance=30,speed=1.2),
+    health=60,
+    loot=loot_table(items={'meat':1,'scale':2},drops=2),
+    texture='mountain_man',
+    damage=9,
+    xp=70,
+    mob_type='mountain_man'
+)
+dying_cherub=mob(
+    ai=ai(is_hostile=True,max_distance=50,speed=2),
+    health=100,
+    loot=loot_table(items={'marble':1,'frost_shard':2},drops=2),
+    texture='dying_cherub',
+    damage=10,
+    xp=85,
+    mob_type='dying_cherub'
+)
+bare_man=mob(
+    ai=ai(is_hostile=True,max_distance=30,speed=1.5),
+    health=50,
+    loot=loot_table(items={'meat':1},drops=3),
+    texture='base_muscular',
+    damage=12,
+    xp=90,
+    mob_type='bare_man'
 )

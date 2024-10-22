@@ -1,5 +1,7 @@
 from base import *
 upgrades=[
+    upgrade(texture='snow_portal',items={'frost_shard':100},upgrade_id='stage_iii',name='Next Stage...',level=15,max=1,upgrade=volcano_stage,name_color=(255,127,0),stage=2),
+    upgrade(texture='snow_portal',items={},upgrade_id='stage_ii',name='Next Stage...',level=11,max=1,upgrade=snow_stage,name_color=(0,255,255)),
     upgrade(texture='dark_orb',items={'dark_orb':10},upgrade_id='power',name='Increase Power',level=16,max=1,upgrade=power_upgrade(1),name_color=(255,0,255)),
     upgrade(items={'iron':10,'wood':4},level=5,upgrade_id='shield_upgrade',name='Shield',max=1,upgrade=lambda:setattr(player, 'can_shield', True),texture='shield_upgrade'),
     upgrade(texture='armor_upgrade',items={'wool':5,'scale':2},upgrade_id='armor_i',name='Upgrade Armor',level=10,max=10,show_uses=True,upgrade=armor_upgrade(1)),

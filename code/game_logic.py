@@ -5,10 +5,10 @@ def update(image:pg.Surface=none,pos:tuple=(0,0)):
     pg.display.flip()
 
 def display(show:bool=True,show_name:bool=True):
-    screen.blit(background,(0,0))
-    screen.blit(ground,((1920-player.x)%1920,1030))
-    screen.blit(ground,(((1920-player.x)%1920)-1920,1030))
-    screen.blit(ground,(((1920-player.x)%1920)+1920,1030))
+    screen.blit(game.background,(0,0))
+    screen.blit(game.ground,((1920-player.x)%1920,1030))
+    screen.blit(game.ground,(((1920-player.x)%1920)-1920,1030))
+    screen.blit(game.ground,(((1920-player.x)%1920)+1920,1030))
     if player.control.attack>0:
         screen.blit(player.attack.texture,(player.attack.x-player.x+(960-player.width//2),1030-player.attack.height-player.attack.y))
     if player.control.shield and player.can_shield:
@@ -48,7 +48,7 @@ def pause_display():
     display(False)
     loc=50
     for upgrade in upgrades:
-        if game.level>=upgrade.level and upgrade.max>0 and loc+game.scroll<1920:
+        if game.level>=upgrade.level and upgrade.max>0 and loc+game.scroll<1920 and game.stage>=upgrade.stage:
             if loc+game.scroll>-500:
                 screen.blit(resize(upgrade.texture,(500,500)),(loc+game.scroll,250))
                 upgrade_name=font.render(upgrade.name,True,upgrade.name_color)
@@ -231,7 +231,8 @@ def display_stats(end:bool=False):
             f'Reflection: {player.reflection}%',
             f'Strike Speed: {player.attack.speed/10}x',
             f'XP Multiplier: {player.xp_boost}x',
-            f'Power: {player.power}'
+            f'Power: {player.power}',
+            f'Stage: {game.stage}'
         ]
         screen.blit(font_large.render(player.name,True,(255,255,255)),(500,200))
         y_coord=275
@@ -308,7 +309,7 @@ def loop():
                         paused=False
                     up_loc=50
                     for upgrade in upgrades:
-                        if game.level>=upgrade.level and upgrade.max>0:
+                        if game.level>=upgrade.level and upgrade.max>0 and game.stage>=upgrade.stage:
                             if button(up_loc+game.scroll,250,500,500):
                                 if upgrade():
                                     player.jump_sound.play()
