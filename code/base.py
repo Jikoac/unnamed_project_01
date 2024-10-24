@@ -483,7 +483,9 @@ class mob:
             death_sound:str='none',
             xp:int=1,
             damage:int=1,
-            zombie=None
+            zombie=None,
+            last_wish=None,
+            hit_sound:str='none'
     ):
         current_frame = inspect.currentframe()
         caller_frame = inspect.getouterframes(current_frame, 2)
@@ -559,6 +561,11 @@ class mob:
         self.shape=self.shapes['right']
         self.damage=damage
         self.zombie=zombie
+        self.last_wish=last_wish
+        try:
+            self.hit_sound=pg.mixer.Sound(self.module.sound(hit_sound))
+        except:
+            self.hit_sound=pg.mixer.Sound(path.sound(hit_sound))
 
 class loot_table:
     class item:
@@ -643,6 +650,17 @@ class sneak_ai:
         self.special_ai='sneak'
         self.distance=distance
 
+class veep_ai:
+    def __init__(self,
+                speed:float|int=1,
+                is_hostile:bool=True,
+                distance:int=50
+                ):
+        self.speed=speed
+        self.is_hostile=is_hostile
+        self.special_ai='veep'
+        self.distance=distance
+
 class projectile:
     def __init__(self,
             ai:str='ai_line(2)',
@@ -653,7 +671,7 @@ class projectile:
             texture_offset:tuple=(0,0),
             mob_type:str='none',
             death_sound:str='none',
-            damage:int=1
+            damage:int=1,
     ):
         current_frame = inspect.currentframe()
         caller_frame = inspect.getouterframes(current_frame, 2)
@@ -723,6 +741,8 @@ class projectile:
         self.texture=self.textures['right']
         self.shape=self.shapes['right']
         self.damage=damage
+        self.last_wish=None
+        self.hit_sound=pg.mixer.Sound(path.sound('none'))
 
 class item:
     def __init__(self,
@@ -804,6 +824,10 @@ class mob_instance(mob):
         elif self.special_ai=='sneak':
             self.facing=self@away_from_player()
             if self.unwatched():
+                self.walk()
+        elif self.special_ai=='veep':
+            self.facing=self@toward_player()
+            if self.watched():
                 self.walk()
         elif self.special_ai=='custom':
             self.ai

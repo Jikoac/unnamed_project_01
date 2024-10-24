@@ -59,3 +59,8 @@ ice_shard=item(
     name='Ice Shard',
     texture='shard_ice'
     )
+lava=item(
+    item_id='lava',
+    name='Lava',
+    texture='lava_drop'
+    )

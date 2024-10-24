@@ -15,6 +15,7 @@ upgrades=[
     upgrade(level=7,texture='damage_upgrade',upgrade_id='damage_1_ii',upgrade=damage_upgrade(1),name='Damage Upgrade II',max=5,show_uses=True,items={'iron':3,'wood':1}),
     upgrade(level=14,texture='damage_upgrade',upgrade_id='damage_2',upgrade=damage_upgrade(2),name='Damage Upgrade III',max=10,show_uses=True,items={'energy':10}),
     upgrade(level=20,texture='damage_upgrade',upgrade_id='damage_3',upgrade=damage_upgrade(3),name='Damage Upgrade IV',max=25,show_uses=True,items={'dark_orb':5}),
+    upgrade(level=21,texture='damage_upgrade',upgrade_id='damage_5',upgrade=damage_upgrade(5),name='Damage Upgrade V',max=15,show_uses=True,items={'lava':5},stage=3),
     upgrade(upgrade=heal_upgrade(2),texture='heart',name='Heal (2)'),
     upgrade(upgrade=heal_upgrade(5),texture='heart',name='Heal (5)',items={'meat':1},level=8),
     upgrade(items={'bread':2,'leaf':1},upgrade=jump_upgrade(10),name='Jump Upgrade',level=3,max=5,show_uses=True,texture='jump_upgrade'),

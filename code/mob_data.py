@@ -4,7 +4,8 @@ farmer=mob(
     health=1,
     loot=loot_table(items={'bread':1}),
     mob_type='farmer',
-    texture='farmer'
+    texture='farmer',
+    death_sound='im_dead'
 )
 knight=mob(
     ai=ai(is_hostile=True,max_distance=50,speed=1.5),
@@ -13,7 +14,9 @@ knight=mob(
     texture='knight',
     damage=2,
     xp=4,
-    mob_type='knight'
+    mob_type='knight',
+    hit_sound='shield',
+    death_sound='knight_death'
 )
 wanderer=mob(
     ai=ai(is_hostile=True,max_distance=40,speed=2),
@@ -22,7 +25,9 @@ wanderer=mob(
     texture='wanderer',
     damage=3,
     xp=7,
-    mob_type='wanderer'
+    mob_type='wanderer',
+    hit_sound='ghastly',
+    death_sound='ghastly'
 )
 tree_man=mob(
     ai=ai(is_hostile=True,max_distance=20,speed=1.5),
@@ -31,7 +36,9 @@ tree_man=mob(
     texture='tree_man',
     damage=5,
     xp=12,
-    mob_type='tree_man'
+    mob_type='tree_man',
+    hit_sound='hit',
+    death_sound='tree_chopped'
 )
 caveman=mob(
     ai=ai(is_hostile=True,max_distance=30,speed=1),
@@ -40,7 +47,9 @@ caveman=mob(
     texture='caveman',
     damage=3,
     xp=7,
-    mob_type='caveman'
+    mob_type='caveman',
+    hit_sound='splat',
+    death_sound='cave_death'
 )
 energen=mob(
     ai=ai(is_hostile=True,max_distance=15,speed=1.5),
@@ -58,7 +67,9 @@ dark_wanderer=mob(
     texture='wanderer_dark',
     damage=5,
     xp=42,
-    mob_type='dark_wanderer'
+    mob_type='dark_wanderer',
+    hit_sound='ghastly',
+    death_sound='sheep_death'
 )
 ogre=mob(
     ai=ai(is_hostile=True,max_distance=0,speed=0.5),
@@ -67,7 +78,9 @@ ogre=mob(
     texture='ogre',
     damage=9,
     xp=25,
-    mob_type='ogre'
+    mob_type='ogre',
+    death_sound='splat',
+    hit_sound='burp'
 )
 evil_orb=projectile(
     ai=forward(5,is_hostile=True),
@@ -78,7 +91,7 @@ evil_orb=projectile(
     mob_type='orb'
 )
 wraith=mob(
-    ai=ai(is_hostile=True,max_distance=10,speed=2.4),
+    ai=ai(is_hostile=True,max_distance=35,speed=2.4),
     health=100,
     loot=loot_table(items={'dark_orb':1,'void':100},drops=3),
     texture='wanderer_wraith',
@@ -96,7 +109,9 @@ damage=15,
 mob_type='orb'
 )""",
         'fire_rate':0.25
-    }
+    },
+    hit_sound='ghastly',
+    death_sound='wraith_death'
 )
 snake=mob(
     ai=ai(is_hostile=True,max_distance=player.width//2-1,speed=2.5),
@@ -105,7 +120,9 @@ snake=mob(
     texture='snake',
     damage=9,
     xp=63,
-    mob_type='snake'
+    mob_type='snake',
+    death_sound='wraith_death',
+    hit_sound='shield'
 )
 large_tree_man=mob(
     ai=ai(is_hostile=True,max_distance=1,speed=1.25),
@@ -114,7 +131,9 @@ large_tree_man=mob(
     texture='tree_man_xl',
     damage=10,
     xp=50,
-    mob_type='large_tree_man'
+    mob_type='large_tree_man',
+    hit_sound='hit',
+    death_sound='tree_chopped'
 )
 sheep=mob(
     ai=ai(is_hostile=False,max_distance=1000,min_distance=800,speed=0.5),
@@ -123,15 +142,19 @@ sheep=mob(
     texture='shep_',
     xp=5,
     mob_type='sheep',
+    hit_sound='ghastly',
+    death_sound='sheep_death'
 )
 farmer_armored=mob(
     ai=ai(is_hostile=True,min_distance=0,max_distance=70,speed=1),
     health=20,
     loot=loot_table(items={'bread':1},drops=2),
-    mob_type='farmer',
+    mob_type='farmer_armored',
     texture='farmored',
     xp=15,
-    damage=7
+    damage=7,
+    hit_sound='hit',
+    death_sound='splat'
 )
 haunter=mob(
     ai=ai(is_hostile=True,max_distance=15,speed=2.5),
@@ -140,7 +163,9 @@ haunter=mob(
     texture='haunter',
     damage=15,
     xp=100,
-    mob_type='haunter'
+    mob_type='haunter',
+    hit_sound='ghastly',
+    death_sound='sheep_death'
 )
 hot_rock=mob(
     ai=ai_line(is_hostile=True,speed=3.5),
@@ -150,7 +175,9 @@ hot_rock=mob(
     shape='hot_rock_mask',
     damage=25,
     xp=100,
-    mob_type='hot_rock'
+    mob_type='hot_rock',
+    hit_sound='shield',
+    death_sound='hit'
 )
 crying_cherub=mob(
     ai=creep_ai(is_hostile=True,distance=50,speed=2),
@@ -159,7 +186,9 @@ crying_cherub=mob(
     texture='cherub',
     damage=10,
     xp=70,
-    mob_type='crying_cherub'
+    mob_type='crying_cherub',
+    hit_sound='hit',
+    death_sound='wraith_death'
 )
 sheep_winter=mob(
     ai=sneak_ai(is_hostile=True,distance=2000,speed=0.75),
@@ -168,6 +197,8 @@ sheep_winter=mob(
     texture='shep_winter',
     xp=25,
     mob_type='sheep_winter',
+    hit_sound='hit',
+    death_sound='sheep_death'
 )
 mountain_man=mob(
     ai=ai(is_hostile=True,max_distance=30,speed=1.2),
@@ -176,16 +207,20 @@ mountain_man=mob(
     texture='mountain_man',
     damage=9,
     xp=70,
-    mob_type='mountain_man'
+    mob_type='mountain_man',
+    hit_sound='splat',
+    death_sound='cave_death'
 )
 dying_cherub=mob(
     ai=ai(is_hostile=True,max_distance=50,speed=2),
     health=100,
-    loot=loot_table(items={'marble':1,'frost_shard':2},drops=2),
+    loot=loot_table(items={'marble':1,'ice_shard':2},drops=2),
     texture='dying_cherub',
     damage=10,
     xp=85,
-    mob_type='dying_cherub'
+    mob_type='dying_cherub',
+    hit_sound='hit',
+    death_sound='wraith_death'
 )
 bare_man=mob(
     ai=ai(is_hostile=True,max_distance=30,speed=1.5),
@@ -194,5 +229,52 @@ bare_man=mob(
     texture='base_muscular',
     damage=12,
     xp=90,
-    mob_type='bare_man'
+    mob_type='bare_man',
+    hit_sound='burp',
+    death_sound='cave_death'
+)
+stone_hound=mob(
+    ai=veep_ai(is_hostile=True,distance=30,speed=2.5),
+    health=75,
+    loot=loot_table(items={'marble':2,'ice_shard':1},drops=2,limited_items=True),
+    texture='stonehound',
+    damage=12,
+    xp=110,
+    mob_type='stone_hound',
+    hit_sound='hit',
+    death_sound='aether_hound_death'
+)
+dead_cherub=mob(
+    ai=ai(is_hostile=True,max_distance=50,speed=2.3),
+    health=130,
+    loot=loot_table(items={'marble':1,'lava':2},drops=2),
+    texture='dead_cherub',
+    damage=13,
+    xp=115,
+    mob_type='dead_cherub',
+    hit_sound='hit',
+    death_sound='lava_angel_death'
+)
+lava_hound=mob(
+    ai=veep_ai(is_hostile=True,distance=40,speed=3),
+    health=100,
+    loot=loot_table(items={'marble':2,'lava':1},drops=2,limited_items=True),
+    texture='lava_hound',
+    damage=15,
+    xp=170,
+    mob_type='lava_hound',
+    hit_sound='hit',
+    death_sound='aether_hound_death'
+)
+ogre_v_5487=mob(
+    ai=ai(is_hostile=True,max_distance=0,speed=0.5),
+    health=25,
+    loot=loot_table(items={'meat':20,'bread':5,'void':10,'lava':1},drops=12),
+    texture='secret_ogre_skin_v_5487',
+    shape='ogre',
+    damage=9,
+    xp=59,
+    mob_type='ogre',
+    death_sound='im_not_dead',
+    hit_sound='burp'
 )

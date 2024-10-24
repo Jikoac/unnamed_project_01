@@ -345,6 +345,7 @@ def loop():
                                 mob.health-=player.damage
                                 if mob.health>0:
                                     player.attack.power-=1
+                                    mob.hit_sound.play()
                                 if player.attack.power==0:
                                     player.control.attack=0
                             if mob.is_dead():
@@ -370,7 +371,11 @@ def loop():
                                 mob.cooldown=max(0,mob.cooldown-1)
                         game.mobs.update(game.spawn_queue)
                         for mob_id in game.dead:
+                            game.mobs[mob_id].death_sound.play()
+                            mob=game.mobs[mob_id]
                             game.kill(mob_id)
+                            if mob.last_wish:
+                                mob.last_wish()
                         for mob_id in game.despawn_queue:
                             game.despawn(mob_id)
                     if not photo_mode:

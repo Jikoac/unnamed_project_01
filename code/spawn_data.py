@@ -22,6 +22,9 @@ generators=[
     spawn_rule(min_distance=1000,max_distance=1200,mob=hot_rock,chance=0.1,min_level=7,spawn_height=100),
     spawn_rule(min_distance=500,max_distance=900,mob=mountain_man,chance=4,min_level=11,min_stage=2,max_stage=2),
     spawn_rule(min_distance=1000,max_distance=1000,mob=dying_cherub,chance=0.5,min_stage=2,max_stage=2,min_level=9),
-    spawn_rule(min_distance=1000,max_distance=1000,mob=dying_cherub,chance=0.5,min_stage=3,min_level=9),
+    spawn_rule(min_distance=1000,max_distance=1000,mob=stone_hound,chance=0.25,min_stage=2,max_stage=2,min_level=12),
+    spawn_rule(min_distance=1000,max_distance=1000,mob=dead_cherub,chance=0.75,min_stage=3,min_level=9),
+    spawn_rule(min_distance=1000,max_distance=1000,mob=lava_hound,chance=0.5,min_stage=3,min_level=13),
+    spawn_rule(min_distance=900,max_distance=1000,mob=ogre_v_5487,chance=0.00000772,min_level=7),
     spawn_rule(min_distance=500,max_distance=1000,mob=bare_man,chance=5,min_stage=3,min_level=10)
 ]
