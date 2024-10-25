@@ -188,7 +188,10 @@ def start():
         name=name_box()
         if name!=None:
             player.name='Player'
-            if name:
+            if name=='101024':
+                player.name='Spider-Man'
+                player.retexture('hero_secret_venom_skin')
+            elif name:
                 player.name=name
             running=False
         if keys[pg.K_LCTRL] and keys[pg.K_q]:

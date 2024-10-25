@@ -296,6 +296,20 @@ class game_player:
     def name_width(self):
         name=font.render(f'{str(game.level)}. {player.name}',True,(255,255,255))
         return name.get_width()
+    def retexture(self,new_texture):
+        self.texture_main=pg.image.load(path.texture(new_texture))
+        self.shape_main=pg.mask.from_surface(pg.image.load(path.texture(new_texture)))
+        self.texture_flipped=pg.transform.flip(self.texture_main,True,False)
+        self.shape_flipped=flip_mask(self.shape_main)
+        self.textures={
+            'right':self.texture_main,
+            'left':self.texture_flipped
+        }
+        self.shapes={
+            'right':self.shape_main,
+            'left':self.shape_flipped
+        }
+
 player=game_player()
 
 class between:
