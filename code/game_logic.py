@@ -191,6 +191,9 @@ def start():
             if name=='101024':
                 player.name='Spider-Man'
                 player.retexture('hero_secret_venom_skin')
+            elif name=='@__together__':
+                player.name='Venom'
+                player.retexture('villain_secret_venom_skin')
             elif name:
                 player.name=name
             running=False
