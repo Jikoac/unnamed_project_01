@@ -309,6 +309,7 @@ class game_player:
             'right':self.shape_main,
             'left':self.shape_flipped
         }
+        self.width,self.height=self.shape_main.get_size()
 
 player=game_player()
 
