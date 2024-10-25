@@ -245,12 +245,14 @@ def scroll():
             if event.button==2:
                 game.scroll_items=0
 
-def loop():
-    try:
-        load_data(os.getlogin())
-    except:
-        print(f'Welcome to Sword: A World Of Chaos, {player.name}')
-        if not player.name:player.name=os.getlogin()
+def loop(first:bool=True):
+    save_data(os.getlogin()+'_cache')
+    if first:
+        try:
+            select_load_data()
+        except:
+            print(f'Welcome to Sword: A World Of Chaos, {player.name}')
+            if not player.name:player.name=os.getlogin()
     running=True
     paused=False
     fullscreen=True
@@ -284,6 +286,9 @@ def loop():
                 keys=pg.key.get_pressed()
                 if keys[pg.K_LCTRL] and keys[pg.K_q]:
                     running=False
+                if keys[pg.K_LCTRL] and keys[pg.K_s]:
+                    save_data(os.getlogin())
+                    save_data(os.getlogin()+'_cache')
                 if keys[pg.K_p] and keys[pg.K_LCTRL] and game.mode.photo:
                     game.photo_mode=True
                 if keys[pg.K_F6]:
@@ -374,6 +379,8 @@ def loop():
                     if not photo_mode:
                         game.time+=1
                 game.event_cache=[]
+                if not (game.time%3000):
+                    save_data(os.getlogin()+'_cache')
                 if game.level==11:
                     dark_orb.name='Dark Orb'
                 if player.armor>=50 and not player.can_guard:
@@ -381,9 +388,16 @@ def loop():
                 if game.mode.debug and keys[pg.K_RCTRL]:
                     debug_mode()
                     paused=False
-    pg.mixer.music.stop()
-    save_data(os.getlogin())
-    game_end()
+    if player.hp<=0:
+        if respawn():
+            loop(False)
+        else:
+            pg.mixer.music.stop()
+            select_save_data()
+            game_end()
+    else:
+        select_save_data()
+        game_end()
 
 def display_score():
     screen.fill((0,60,50))
@@ -416,7 +430,6 @@ def display_score():
 def game_end():
     display_stats(True)
     running=True
-    pg.time.delay(500)
     while running:
         for event in pg.event.get():
             if event.type==pg.QUIT:

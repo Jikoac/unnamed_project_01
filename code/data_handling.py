@@ -112,8 +112,63 @@ def load_data(name:str):
                     upgrade.max=upgrade_uses[upgrade.id]
             file.close()
         with open(data_path.mob,'r') as file:
+            game.mobs={}
             for line in file:
                 line_data=eval(line)
                 game.summon(*line_data)
             file.close()
     return
+
+def select_load_data():
+    screen.blit(pg.image.load(path.texture('load_data')),(0,0))
+    pg.mouse.set_visible(True)
+    pg.display.flip()
+    running=True
+    while running:
+        for event in pg.event.get():
+            if event.type==pg.MOUSEBUTTONDOWN:
+                game.event_cache.append(event)
+        if button(601,341,617,151):
+            load_data(os.getlogin())
+            return True
+        if button(602,569,616,151):
+            return False
+        game.event_cache=[]
+
+def select_save_data():
+    screen.blit(pg.image.load(path.texture('save_data')),(0,0))
+    pg.mouse.set_visible(True)
+    pg.display.flip()
+    running=True
+    while running:
+        for event in pg.event.get():
+            if event.type==pg.MOUSEBUTTONDOWN:
+                game.event_cache.append(event)
+        if button(601,341,617,151):
+            save_data(os.getlogin())
+            return True
+        if button(602,569,616,151):
+            return False
+        game.event_cache=[]
+
+def respawn():
+    screen.blit(pg.image.load(path.texture('respawn')),(0,0))
+    pg.mouse.set_visible(True)
+    pg.display.flip()
+    running=True
+    while running:
+        for event in pg.event.get():
+            if event.type==pg.MOUSEBUTTONDOWN:
+                game.event_cache.append(event)
+        if button(601,341,617,151):
+            load_data(os.getlogin()+'_cache')
+            return True
+        if button(602,569,616,151):
+            return False
+        game.event_cache=[]
+
+def kill_cache(name=os.getlogin()):
+    try:
+        os.removedirs(path.data+name+'_cache')
+    except:
+        None
