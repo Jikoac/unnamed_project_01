@@ -36,6 +36,7 @@ class path:
         self.texture=self.subpath(self.asset+'textures','.png')
         self.sound=self.subpath(self.asset+'sounds','.mp3')
         self.mod=self.subpath(self.main+'mods','.py')
+        self.data=self.subpath(self.main+'data','')
     def __call__(self,file):
         return self.main+'/'+file
     class mod_path(subpath):
@@ -48,6 +49,17 @@ class path:
             self.direct=str(self.main)
             self.primary=path.subpath(self.direct,'')
             self.extension='.py'
+    class data_path(subpath):
+        def __init__(self,name):
+            self.main=path.subpath(path.data+name,'')
+            self.stat=self.main+'stats'
+            self.mob=self.main+'mobs'
+            self.upgrade=self.main+'upgrades'
+            self.mod=self.main+'mods'
+            self.name=self.main+'name'
+            self.loot=self.main+'loot'
+            self.direct=str(self.main)
+            self.extension=''
     def __add__(self,other):
         return self.main+'/'+other
 
@@ -449,6 +461,7 @@ class game_class:
     event_cache=[]
     despawn_queue=[]
     music=False
+    photo_mode=False
     stage=1
     background=pg.image.load(path.texture('background'))
     ground=pg.image.load(path.texture('ground'))
@@ -479,6 +492,10 @@ class game_class:
     def get_clicked(self):
         for key in self.keys.values():
             key()
+    def summon(self,mob,x,y,facing,id,hp):
+        self.mobs.update({id:mob_instance(mob,x,y,id,facing)})
+        self.mobs[id].health=hp
+
 
 game=game_class()
 
@@ -855,6 +872,9 @@ class mob_instance(mob):
         if self.health<=0 and self.max_health:
             return True
         return False
+    def __format__(self,format_spec):
+        if format_spec=='data':
+            return f'({self.type},{self.x},{self.y},"{self.facing}","{self.id}",{self.health})'
     def walk(self):
         if self.facing=='left':
             self.x-=self.speed
@@ -971,7 +991,7 @@ class upgrade:
             name:str='Upgrade',
             texture:str='none',
             level:int=1,
-            max:int=10**100,
+            max:int=-1,
             show_uses:bool=False,
             name_color=(255,255,255),
             stage:int=1
@@ -1044,6 +1064,18 @@ resize=pg.transform.scale
 
 def add(x,y):
     return tuple([x[i]+y[i] for i in range(len(x))])
+
+def button(x, y, width, height, color=None):
+    box_rect = pg.Rect(x, y, width, height)
+    if color!=None:
+        pg.draw.rect(screen, color, box_rect)
+    for event in game.event_cache:
+        if event.type==pg.MOUSEBUTTONDOWN and event.button==1:
+            if pg.mouse.get_pos()==in_rect(box_rect):
+                return True
+    if player.control.select and pg.mouse.get_pos()==in_rect(box_rect):
+        return True
+    return False
 
 class toward_player:
     def __rmul__(self,it:float|int|mob_instance):
@@ -1146,3 +1178,234 @@ snow_stage=stage(2,'background_snow','ground_snow')
 volcano_stage=stage(3,'background_volcanic','ground_volcanic')
 default_stage=stage(1)
 stages=[default_stage,snow_stage,volcano_stage]
+
+
+def binary(value:int|str=0,length:int=8):
+    '''Convert a string or int to binary'''
+    if isinstance(value,str):
+        out=''
+        for l in value:
+            out+=f'{ord(l):0{length}b}'
+        return out
+    return f'{value:0{length}b}'
+
+def total(x):
+    '''Returns a range of the length of \'x\''''
+    return(list(range(len(x))))
+
+class bitset:
+    '''A class for data stored in binary, 
+the special keys are:
+    any: any bit in the data, 
+    all: all bits in the data, 
+    int: the data as an integer, 
+    len: the length of the data, 
+    bin: the data as binary, 
+    range: the range keywords, 
+    map: the keywords, 
+    color: the data as a color'''
+    def __init__(self, length:int=8,*keys:str,**kwargs):
+        self.data = 0
+        self.length = length
+        bit_range=range(length)
+        self.keys=dict(zip(keys,bit_range))
+        self.ranges:dict[str,tuple[int,int]]={}
+        if 'ranges' in kwargs:
+            self.ranges.update(kwargs['ranges'])
+        if 'keys' in kwargs:
+            self.keys.update(kwargs['keys'])
+        if 'map' in kwargs:
+            self.map(kwargs['map'])
+        self.from_str,self.from_bytes=self.new_methods()
+
+    def __call__(self, length:int):
+        if length < self.length:
+            self.data = min(self.data,(2**length)-1)
+        self.length = length
+
+    def __getitem__(self, index:int):
+        if type(index)==str:
+            if index in self.ranges:
+                index=self.ranges[index]
+            elif index in self.keys:
+                index=self.keys[index]
+            else:
+                raise KeyError(index)
+        if isinstance(index,tuple):
+            index=range(index[0],index[1])
+        if index==any:
+            return any(f'{self.data:0{self.length}b}')
+        elif index==all:
+            return all(f'{self.data:0{self.length}b}')
+        elif index==int:
+            return self.data
+        elif index==len:
+            return self.length
+        elif index==bin:
+            return repr(self)
+        elif index==range:
+            return self.ranges
+        elif index==map:
+            return self.keys
+        elif isinstance(index,range):
+            value=[]
+            for i in index:
+                value.append(str(int((self.data >> i) & 1 == 1)))
+            value.reverse()
+            return ''.join(value)
+        elif index >= self.length:
+            raise IndexError("Index out of range")
+        else:
+            return (self.data >> index) & 1 == 1
+
+    def __setitem__(self, index:int|None, value:int):
+        if type(index)==str:
+            if index in self.ranges:
+                index=self.ranges[index]
+            elif index in self.keys:
+                index=self.keys[index]
+            else:
+                raise KeyError(index)
+        if isinstance(index,tuple):
+            index=range(index[0],index[1])
+        if index==any:
+            index=randrange(self.length)
+        if index==all:
+            self.data=int('0b'+(str(int(value))*self.length),base=2)
+        elif index==len:
+            self(value)
+        elif index==int:
+            self.data=value
+            self.length=max(self.length,len(repr(self)))
+        elif index==bin:
+            self.data=int(str(value),base=2)
+            self.length=max(self.length,len(repr(self)))
+        elif index==range:
+            self.ranges=value
+        elif index==map:
+            self.keys=value
+        elif isinstance(index,range):
+            if max(index) >= self.length:
+                raise IndexError("Index out of range")
+            value=str(value)
+            for i in index:
+                if int(value[len(index)-1-(i-min(index))]):
+                    self.data |= (1 << i)
+                else:
+                    self.data &= ~(1 << i)
+        else:
+            if index >= self.length:
+                raise IndexError("Index out of range")
+            if value:
+                self.data |= (1 << index)
+            else:
+                self.data &= ~(1 << index)
+
+    def __repr__(self):
+        return f'{self.data:0{self.length}b}'
+    
+    def toggle(self,index:str|int=0):
+        self[index]= not self[index]
+
+    def number(self,index:range):
+        if isinstance(index,str):
+            index=self.ranges[index]
+        if isinstance(index,tuple):
+            index=range(index[0],index[1])
+        value=[]
+        for i in index:
+            value.append(str(int((self.data >> i) & 1 == 1)))
+        value.reverse()
+        value=''.join(value)
+        return int(value,base=2)
+    
+    def ascii(self,index:int=0,utf:int=8):
+        return chr(self.number(range(index,index+utf)))
+
+    def assign_character(self,value='a',index:int=0):
+        for i in total(binary(value)):
+            self[index+i]=bool(int(binary(value)[len(binary(value))-1-i]))
+
+    def bytes(self):
+        return int(repr(self.data), 2).to_bytes((len(repr(self.data)) + 7) // 8, byteorder='big')
+    
+    def from_bytes(bytes:bytes=int(0).to_bytes()):
+        self=bitset(len(bytes)*8)
+        self.data=int.from_bytes(bytes)
+        self.adjust()
+        return self
+
+    def str(self,utf:int=8):
+        string=''
+        for i in range(0,self.length,utf):
+            string+=self.ascii(i,utf)
+        return string
+    
+    def from_str(string:str='',utf:int=8):
+        self=bitset(len(string)*utf)
+        for i in range(len(string)):
+            self.assign_character(string[i],i*utf)
+        self.adjust()
+        return self
+    
+    def adjust(self,can_extend:bool=True,can_shorten:bool=False):
+        if can_extend:
+            self.length=max(self.length,len(repr(self.data)))
+        if can_shorten:
+            self.length=min(self.length,len(repr(self.data)))
+
+    def new_methods(self):
+        def str_method(string:str,utf:int=8):
+            data=bitset(len(string)*utf)
+            for i in range(len(string)):
+                data.assign_character(string[i],i*utf)
+            self.adjust()
+            self.data=data.data
+        def bytes_method(bytes:bytes):
+            data=bitset(len(bytes)*8)
+            data.data=int.from_bytes(bytes)
+            self.data=data.data
+            self.adjust()
+        return str_method,bytes_method
+
+    def map(self,map:dict[str,int|range|tuple]|None=None,destroy_old:bool=False,use_bits:bool=True):
+        '''Change and/or return the keys and range keys in the bitset\n
+destroy_old
+    True: Destroy the old keys
+    False: Keep the old keys\n
+use_bits
+    True: Use bit numbers ({'a':1,'b':2,'c':4}) for values
+    False: Use indexes and ranges ({'a':0,'b':(1,3),'c':(3,7)}) for values'''
+        if use_bits:
+            if destroy_old:
+                self.keys={}
+                self.ranges={}
+            if map!=None:
+                index=0
+                for k,v in map.items():
+                    if v==1:
+                        self.keys.update({k:index})
+                    else:
+                        self.ranges.update({k:(index,index+v)})
+                    index+=v
+            maps=dict(self.keys)
+            maps.update(self.ranges)
+            return maps
+        else:
+            if destroy_old:
+                self.keys={}
+                self.ranges={}
+            if map!=None:
+                for k,v in map.items():
+                    if isinstance(v,int):
+                        self.keys.update({k:v})
+                    elif isinstance(v,(range,tuple)):
+                        self.ranges.update({k:v})
+            maps=self.keys
+            maps.update(self.ranges)
+            return maps
+
+def is_positive(number:int|float):
+    if number>=0:
+        return True
+    return False

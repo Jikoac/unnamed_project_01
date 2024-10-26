@@ -1,4 +1,4 @@
-from mod_import_config import *
+from data_handling import *
 
 def update(image:pg.Surface=none,pos:tuple=(0,0)):
     screen.blit(image,pos)
@@ -83,18 +83,6 @@ def pause_display():
 #        highlight(loc,50,100,100,it.name)
 #        loc+=150
     update()
-
-def button(x, y, width, height, color=None):
-    box_rect = pg.Rect(x, y, width, height)
-    if color!=None:
-        pg.draw.rect(screen, color, box_rect)
-    for event in game.event_cache:
-        if event.type==pg.MOUSEBUTTONDOWN and event.button==1:
-            if pg.mouse.get_pos()==in_rect(box_rect):
-                return True
-    if player.control.select and pg.mouse.get_pos()==in_rect(box_rect):
-        return True
-    return False
 
 def highlight(x, y, width, height, text=''):
     box_rect = pg.Rect(x, y, width, height)
@@ -187,7 +175,7 @@ def start():
         pg.display.flip()
         name=name_box()
         if name!=None:
-            player.name='Player'
+            player.name=None
             if name=='101024':
                 player.name='Spider-Man'
                 player.retexture('hero_secret_symbiote_skin','hero_secret_symbiote_body')
@@ -264,8 +252,14 @@ def scroll():
             if event.button==2:
                 game.scroll_items=0
 
-def loop():
-    photo_mode=False
+def loop(first:bool=True):
+    save_data(os.getlogin()+'_cache')
+    if first:
+        try:
+            select_load_data()
+        except:
+            print(f'Welcome to Sword: A World Of Chaos, {player.name}')
+            if not player.name:player.name=os.getlogin()
     running=True
     paused=False
     fullscreen=True
@@ -292,23 +286,26 @@ def loop():
                     if event.gain == 0 and fullscreen:
                         paused=True
             elif event.type==game_tick:
+                photo_mode=game.photo_mode
                 game.get_clicked()
                 game.dead=[]
                 game.level_up()
                 keys=pg.key.get_pressed()
                 if keys[pg.K_LCTRL] and keys[pg.K_q]:
                     running=False
+                if keys[pg.K_LCTRL] and keys[pg.K_s]:
+                    save_data(os.getlogin())
+                    save_data(os.getlogin()+'_cache')
                 if keys[pg.K_p] and keys[pg.K_LCTRL] and game.mode.photo:
-                    photo_mode=True
+                    game.photo_mode=True
                 if keys[pg.K_F6]:
-                    photo_mode=False
+                    game.photo_mode=False
                 if keys[pg.K_LCTRL] and keys[pg.K_F12]:
                     game.mode.debug=True
                     game.mode.photo=True
                     player.can_shield=True
                 if paused:
                     player.control.get_select()
-                    player.control.move_mouse()
                     pg.mouse.set_visible(True)
                     scroll()
                     if game.keys['pause'].click or game.keys['esc'].click:
@@ -394,6 +391,8 @@ def loop():
                     if not photo_mode:
                         game.time+=1
                 game.event_cache=[]
+                if not (game.time%3000):
+                    save_data(os.getlogin()+'_cache')
                 if game.level==11:
                     dark_orb.name='Dark Orb'
                 if player.armor>=50 and not player.can_guard:
@@ -401,8 +400,16 @@ def loop():
                 if game.mode.debug and keys[pg.K_RCTRL]:
                     debug_mode()
                     paused=False
-    pg.mixer.music.stop()
-    game_end()
+    if player.hp<=0:
+        if respawn():
+            loop(False)
+        else:
+            pg.mixer.music.stop()
+            select_save_data()
+            game_end()
+    else:
+        select_save_data()
+        game_end()
 
 def display_score():
     screen.fill((0,60,50))
@@ -435,7 +442,6 @@ def display_score():
 def game_end():
     display_stats(True)
     running=True
-    pg.time.delay(500)
     while running:
         for event in pg.event.get():
             if event.type==pg.QUIT:
