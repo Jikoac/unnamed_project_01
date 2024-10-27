@@ -13,5 +13,5 @@ except:
 # player.range*=10
 # player.power=2
 # player.jump_height*=2
-#pg.mixer.music.load("C:/Users/Public/Music/Griffin Armageddon/Zapolemos Quest (Deluxe Edition)/1/A Saga Begins.mp3")
-#game.music=True
+pg.mixer.music.load("C:/Users/Public/Music/Griffin Armageddon/Zapolemos Quest (Deluxe Edition)/1/A Saga Begins.mp3")
+game.music=True

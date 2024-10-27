@@ -465,7 +465,7 @@ class game_class:
     stage=1
     background=pg.image.load(path.texture('background'))
     ground=pg.image.load(path.texture('ground'))
-    #screen=screen
+    mods=[]
     def spawn(self,mob,x,y,facing:str|None=None,queue:bool=False):
         if facing==None:
             facing=x*toward_player()
@@ -1409,3 +1409,6 @@ def is_positive(number:int|float):
     if number>=0:
         return True
     return False
+
+def time(number:int):
+    return f'{number//3600}:{str((number%3600)//60).zfill(2)}:{str(number%60).zfill(2)}'

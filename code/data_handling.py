@@ -88,6 +88,9 @@ def save_data(name:str):
     with open(data_path.mob,'w') as file:
         file.write('\n'.join([format(mob,'data') for mob in game.mobs.values()]))
         file.close()
+    with open(data_path.mod,'w') as file:
+        file.write('",\n"'.join(game.mods))
+        file.close()
 
 def load_data(name:str):
     data_path=path.data_path(name)
@@ -117,6 +120,9 @@ def load_data(name:str):
                 line_data=eval(line)
                 game.summon(*line_data)
             file.close()
+    with open(data_path.mod,'r') as file:
+        game.mods=eval(f'["{file.read}"]')
+        file.close()
     return
 
 def select_load_data():

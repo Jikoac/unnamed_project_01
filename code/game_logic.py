@@ -48,7 +48,7 @@ def pause_display():
     display(False)
     loc=50
     for upgrade in upgrades:
-        if game.level>=upgrade.level and upgrade.max>0 and loc+game.scroll<1920 and game.stage>=upgrade.stage:
+        if game.level>=upgrade.level and upgrade.max!=0 and loc+game.scroll<1920 and game.stage>=upgrade.stage:
             if loc+game.scroll>-500:
                 screen.blit(resize(upgrade.texture,(500,500)),(loc+game.scroll,250))
                 upgrade_name=font.render(upgrade.name,True,upgrade.name_color)
@@ -216,6 +216,7 @@ def display_stats(end:bool=False):
             f'Health: {player.hp}/{player.max_hp}',
             f'Level: {game.level}',
             f'XP: {player.xp}',
+            f'Time: {time(game.time//100)}',
             f'Damage: {player.damage}',
             f'Armor: {player.armor}%',
             f'Speed: {(player.speed/2)@rounded(3)}x',
@@ -255,11 +256,7 @@ def scroll():
 def loop(first:bool=True):
     save_data(os.getlogin()+'_cache')
     if first:
-        try:
-            select_load_data()
-        except:
-            print(f'Welcome to Sword: A World Of Chaos, {player.name}')
-            if not player.name:player.name=os.getlogin()
+        if not player.name:player.name=os.getlogin()
     running=True
     paused=False
     fullscreen=True
@@ -312,7 +309,7 @@ def loop(first:bool=True):
                         paused=False
                     up_loc=50
                     for upgrade in upgrades:
-                        if game.level>=upgrade.level and upgrade.max>0 and game.stage>=upgrade.stage:
+                        if game.level>=upgrade.level and upgrade.max!=0 and game.stage>=upgrade.stage:
                             if button(up_loc+game.scroll,250,500,500):
                                 if upgrade():
                                     player.jump_sound.play()

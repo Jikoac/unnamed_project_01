@@ -4,8 +4,12 @@ def list_directories(path):
     directories = [entry for entry in entries if os.path.isdir(os.path.join(path, entry))]
     return directories
 
-def activate_mods():
-    mods=select_mods()
+def activate_mods(select:bool=False):
+    if select:
+        mods=game.mods
+    else:
+        mods=select_mods()
+        game.mods=mods
     imports=['items','ai','loot_tables','projectiles','mobs','other']
     import_data={'items':'item_data','ai':'ai_data','loot_tables':'loot_table_data','projectiles':'projectile_data','mobs':'mob_data'}
     for i in imports:

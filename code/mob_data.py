@@ -15,7 +15,7 @@ knight=mob(
     damage=2,
     xp=4,
     mob_type='knight',
-    hit_sound='shield',
+    hit_sound='armor',
     death_sound='knight_death'
 )
 wanderer=mob(
@@ -88,7 +88,7 @@ evil_orb=projectile(
     loot=loot_table(items={'dark_orb':1,'energy':3,'void':10},drops=3),
     texture='evil_orb',
     damage=15,
-    mob_type='orb'
+    mob_type='evil_orb'
 )
 wraith=mob(
     ai=ai(is_hostile=True,max_distance=35,speed=2.4),
@@ -106,7 +106,7 @@ health=25,
 loot=loot_table(items={'dark_orb':1,'energy':3,'void':10},drops=3),
 texture='evil_orb',
 damage=15,
-mob_type='orb'
+mob_type='evil_orb'
 )""",
         'fire_rate':0.25
     },
