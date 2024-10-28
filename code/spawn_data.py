@@ -14,7 +14,7 @@ generators=[
     spawn_rule(min_distance=500,max_distance=500,mob=snake,chance=0.2,min_level=10,max_level=10),
     spawn_rule(min_distance=500,max_distance=500,mob=snake,chance=2,min_level=11,max_stage=1),
     spawn_rule(min_distance=900,max_distance=1000,mob=wraith,chance=0.05,min_level=11,spawn_height=50),
-    spawn_rule(min_distance=1000,max_distance=1000,mob=haunter,chance=0.25,min_level=12),
+    spawn_rule(min_distance=1000,max_distance=1000,mob=haunter,chance=0.025,min_level=12),
     spawn_rule(min_distance=50,max_distance=350,mob=sheep,chance=1,min_level=6,max_stage=1),
     spawn_rule(min_distance=50,max_distance=350,mob=sheep_winter,chance=1,min_level=11,min_stage=2),
     spawn_rule(min_distance=player.width*2,mob=farmer_armored,chance=2.5,min_level=8,max_level=13),

@@ -11,7 +11,7 @@ data_keys={'can_shield':280,'debug':281,'photo':282,'photo_mode':283,'pos_x':348
 
 data_map_00={'format':8,'max_hp':8,'hp':8,'damage':8,'xp':64,'x':32,'y':16,'speed':16,'xp_boost':8,
             'mob_count':64,'armor':8,'jump_height':8,'range':8,'reflection':8,'strike':16,'can_shield':1,
-            'debug':1,'photo':1,'photo_mode':1,'time':64,'pos_x':1,'facing':1}
+            'debug':1,'photo':1,'photo_mode':1,'time':64,'pos_x':1,'facing':1,'stage':2}
 
 def binary_data():
     data=bitset(350,map=data_map_00)
@@ -37,6 +37,7 @@ def binary_data():
     data['time']=binary(game.time,64)
     data['pos_x']=is_positive(player.x)
     data['facing']=1 if player.facing=='right' else 0
+    data['stage']=game.stage
     return int(repr(data), 2).to_bytes((len(repr(data)) + 7) // 8, byteorder='big')
 
 def extract_from_binary(data:bitset):
@@ -65,6 +66,7 @@ def extract_from_binary(data:bitset):
         game.photo_mode=data['photo_mode']
         game.time=data.number('time')
         player.facing='right' if data['facing'] else 'left'
+        stages[data.number('stage')]()
     return
 
 def save_data(name:str):
