@@ -27,7 +27,7 @@ wanderer=mob(
     xp=7,
     mob_type='wanderer',
     hit_sound='ghastly',
-    death_sound='ghastly'
+    death_sound='wanderer_death'
 )
 tree_man=mob(
     ai=ai(is_hostile=True,max_distance=20,speed=1.5),
@@ -58,7 +58,9 @@ energen=mob(
     texture='energen',
     damage=2,
     xp=19,
-    mob_type='energen'
+    mob_type='energen',
+    hit_sound='electro_hit',
+    death_sound='electro_death'
 )
 dark_wanderer=mob(
     ai=ai(is_hostile=True,max_distance=25,speed=2.25),
@@ -69,7 +71,7 @@ dark_wanderer=mob(
     xp=42,
     mob_type='dark_wanderer',
     hit_sound='ghastly',
-    death_sound='sheep_death'
+    death_sound='dark_wanderer_death'
 )
 ogre=mob(
     ai=ai(is_hostile=True,max_distance=0,speed=0.5),
@@ -188,7 +190,7 @@ crying_cherub=mob(
     xp=70,
     mob_type='crying_cherub',
     hit_sound='hit',
-    death_sound='wraith_death'
+    death_sound='angel_death'
 )
 sheep_winter=mob(
     ai=sneak_ai(is_hostile=True,distance=2000,speed=0.75),
@@ -220,7 +222,7 @@ dying_cherub=mob(
     xp=85,
     mob_type='dying_cherub',
     hit_sound='hit',
-    death_sound='wraith_death'
+    death_sound='aether_angel_death'
 )
 bare_man=mob(
     ai=ai(is_hostile=True,max_distance=30,speed=1.5),

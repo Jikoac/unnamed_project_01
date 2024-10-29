@@ -466,6 +466,8 @@ class game_class:
     background=pg.image.load(path.texture('background'))
     ground=pg.image.load(path.texture('ground'))
     mods=[]
+    upgrade_uses={}
+    upgrades=[]
     def spawn(self,mob,x,y,facing:str|None=None,queue:bool=False):
         if facing==None:
             facing=x*toward_player()

@@ -189,6 +189,11 @@ def start():
             return True
     return False
 
+def set_upgrades():
+            for upgrade in upgrades:
+                if upgrade.id in game.upgrade_uses:
+                    upgrade.max=game.upgrade_uses[upgrade.id]
+
 def display_stats(end:bool=False):
     running=True
     game.event_cache=[]
@@ -254,6 +259,7 @@ def scroll():
                 game.scroll_items=0
 
 def loop(first:bool=True):
+    set_upgrades()
     save_data(os.getlogin()+'_cache')
     if first:
         if not player.name:player.name=os.getlogin()

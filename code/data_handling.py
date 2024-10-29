@@ -14,7 +14,7 @@ data_map_00={'format':8,'max_hp':8,'hp':8,'damage':8,'xp':64,'x':32,'y':16,'spee
             'debug':1,'photo':1,'photo_mode':1,'time':64,'pos_x':1,'facing':1,'stage':2}
 
 def binary_data():
-    data=bitset(350,map=data_map_00)
+    data=bitset(352,map=data_map_00)
     data['format']='00000000'
     data['max_hp']=binary(max(player.max_hp,0))
     data['hp']=binary(player.hp)
@@ -37,7 +37,7 @@ def binary_data():
     data['time']=binary(game.time,64)
     data['pos_x']=is_positive(player.x)
     data['facing']=1 if player.facing=='right' else 0
-    data['stage']=game.stage
+    data['stage']=binary(game.stage)
     return int(repr(data), 2).to_bytes((len(repr(data)) + 7) // 8, byteorder='big')
 
 def extract_from_binary(data:bitset):
@@ -91,7 +91,10 @@ def save_data(name:str):
         file.write('\n'.join([format(mob,'data') for mob in game.mobs.values()]))
         file.close()
     with open(data_path.mod,'w') as file:
-        file.write(f'["{'",\n"'.join(game.mods)}"]')
+        if game.mods:
+            file.write(f'["{'","'.join(game.mods)}"]')
+        else:
+            file.write('[]')
         file.close()
 
 def load_data(name:str):
@@ -111,10 +114,7 @@ def load_data(name:str):
             exec(file.read())
             file.close()
         with open(data_path.upgrade,'r') as file:
-            upgrade_uses=eval(file.read())
-            for upgrade in upgrades:
-                if upgrade.id in upgrade_uses:
-                    upgrade.max=upgrade_uses[upgrade.id]
+            game.upgrade_uses=eval(file.read())
             file.close()
         with open(data_path.mob,'r') as file:
             game.mobs={}
